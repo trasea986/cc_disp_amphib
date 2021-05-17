@@ -165,8 +165,9 @@ point_count <- occ_df_final %>%
   group_by(species) %>%
   tally()
 
-#write table of points used
-#write.csv(point_count, file="./outputs/supp_table1.csv")
+#write table of points used count and the input data
+#write.csv(point_count, file="./outputs/supp_table1.csv", row.names = FALSE)
+#write.csv(occ_df_final, file="./outputs/data_proc/cleaned_points.csv", row.names = FALSE)
 
 #make plot to check points
 
