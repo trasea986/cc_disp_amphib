@@ -91,7 +91,7 @@ occ_df <- occ_df[flags$.summary,]
 #reproject points to albers equal area
 
 #set project projection
-projection <- "+proj=aea +lat_1=20 +lat_2=60 +lat_0=40 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83"
+projection <- "ESRI:102008"
 
 points_spatial <- occ_df
 coordinates(points_spatial) <- ~decimalLongitude+decimalLatitude
@@ -175,7 +175,7 @@ point_count <- occ_df_final %>%
 world <- ne_countries(scale = "medium", returnclass = "sf")
 
 #reproject world map
-world_repro <- st_transform(world, CRS("+proj=aea +lat_1=20 +lat_2=60 +lat_0=40 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83"))
+world_repro <- st_transform(world, CRS("ESRI:102008"))
 
 #take reprojected points_final and make a dataframe
 

@@ -1,14 +1,16 @@
 library(tidyverse)
 library(rgdal)
-library(terra) #Hijmans created to help speed up some functions from the raster package. This uses SpatRaster objects
+library(terra) #Hijmans created to help speed up some functions from the raster package. This uses SpatRaster objects. Using this going forward.
 library(corrplot)
 library(caret)
 
-#start by bringing in the final point file for all fo the species
-points_all_sp <- read.csv('./outputs/data_proc/cleaned_points.csv')
-
 #defining projection object in case this is run not after complete the 01 script
 projection <- "+proj=aea +lat_1=20 +lat_2=60 +lat_0=40 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83"
+
+#start by bringing in the final point file for all fo the species
+points_all_sp <- read.csv('./outputs/data_proc/cleaned_points.csv')
+points_all_sp_spatial <- vect(points_all_sp,geom=c("decimalLongitude", "decimalLatitude"), crs=projection)
+
 
 #going to move species to first column to match general example data trends / if this was to be exported to run in maxent outside of R
 points_all_sp <- points_all_sp %>% dplyr::select(species, everything())
@@ -23,3 +25,9 @@ bio_layers <- rast(bio_files)
 ext <- rast(xmin=-180, xmax=-25, ymin=10, ymax=180)
 crs(ext) <- crs(bio_layers$wc2.1_30s_bio_1)
 bio_layers <- crop(bio_layers, ext)
+
+#reproject to albers equal area conic
+Sys.time()
+bio1 <- terra::project(bio_layers$wc2.1_30s_bio_1, method="bilinear", mask=TRUE, projection)
+Sys.time()
+bio_layers <- terra::project(bio_layers, projection)
