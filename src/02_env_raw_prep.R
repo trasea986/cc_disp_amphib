@@ -5,7 +5,7 @@ library(corrplot)
 library(caret)
 
 #defining projection object in case this is run not after complete the 01 script
-projection <- "+proj=aea +lat_1=20 +lat_2=60 +lat_0=40 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83"
+projection <- projection <- "ESRI:102008"
 
 #start by bringing in the final point file for all fo the species
 points_all_sp <- read.csv('./outputs/data_proc/cleaned_points.csv')
@@ -27,7 +27,11 @@ crs(ext) <- crs(bio_layers$wc2.1_30s_bio_1)
 bio_layers <- crop(bio_layers, ext)
 
 #reproject to albers equal area conic
-Sys.time()
-bio1 <- terra::project(bio_layers$wc2.1_30s_bio_1, method="bilinear", mask=TRUE, projection)
-Sys.time()
-bio_layers <- terra::project(bio_layers, projection)
+bio_layers <- terra::project(bio_layers, method="bilinear", mask=TRUE, projection)
+
+
+
+
+
+#this takes a long time, so I am going to write this stack
+#writeRaster(bio1,"./outputs/data_proc/present_reprojected.tif", overwrite=TRUE, gdal=c("COMPRESS=LZW", "TFW=YES","of=COG"), datatype='INT1U')
