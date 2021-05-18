@@ -1,0 +1,25 @@
+library(tidyverse)
+library(rgdal)
+library(terra) #Hijmans created to help speed up some functions from the raster package. This uses SpatRaster objects
+library(corrplot)
+library(caret)
+
+#start by bringing in the final point file for all fo the species
+points_all_sp <- read.csv('./outputs/data_proc/cleaned_points.csv')
+
+#defining projection object in case this is run not after complete the 01 script
+projection <- "+proj=aea +lat_1=20 +lat_2=60 +lat_0=40 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83"
+
+#going to move species to first column to match general example data trends / if this was to be exported to run in maxent outside of R
+points_all_sp <- points_all_sp %>% dplyr::select(species, everything())
+
+#create list of env data
+bio_files <- list.files(path = './data_raw/present', pattern = '*.tif', all.files = TRUE, full.names = TRUE)
+
+#load in the rasters
+bio_layers <- rast(bio_files)
+
+#going to do an initial crop of NW hemisphere to speed up reprojection prior to dealing with correlated variables
+ext <- rast(xmin=-180, xmax=-25, ymin=10, ymax=180)
+crs(ext) <- crs(bio_layers$wc2.1_30s_bio_1)
+bio_layers <- crop(bio_layers, ext)
