@@ -3,6 +3,7 @@ library(rgdal)
 library(terra) #Hijmans created to help speed up some functions from the raster package. This uses SpatRaster objects. Using this going forward.
 library(corrplot)
 library(caret)
+library(sp)
 
 #defining projection object in case this is run not after complete the 01 script
 projection <- "ESRI:102008"
@@ -81,7 +82,10 @@ predictors_final <- subset(bio_layers_repro, names(predictors_final_list))
 #names of rasters in the stack
 bio_names <- names(predictors_final)
 
-writeRaster(predictors_final, filetype = 'GTiff', tempdir = "./outputs/data_proc/present_repro_nocor", names = bio_names, overwrite=TRUE)
+terra::writeRaster(predictors_final, './outputs/data_proc/present_repro_nocor/predictors_final.tiff', filetype = 'GTiff',names = bio_names, overwrite=TRUE)
+
+#and to read in
+predictors_final_test <- rast('./outputs/data_proc/present_repro_nocor/predictors_final.tiff')
 
 #next will be cropping each one for model training so that background extent is not too large
 
@@ -102,12 +106,76 @@ points_LISY_spatial <- points_LISY
 points_PSMA_spatial <- points_PSMA
 points_RALU_spatial <- points_RALU
 
+#turn points to Spatvector
 points_ABMA_spatial <- vect(points_ABMA_spatial, type = 'points', crs = projection, geom=c("decimalLongitude", "decimalLatitude"))
+points_ANBO_spatial <- vect(points_ANBO_spatial, type = 'points', crs = projection, geom=c("decimalLongitude", "decimalLatitude"))
+points_ANHE_spatial <- vect(points_ANHE_spatial, type = 'points', crs = projection, geom=c("decimalLongitude", "decimalLatitude"))
+points_LISY_spatial <- vect(points_LISY_spatial, type = 'points', crs = projection, geom=c("decimalLongitude", "decimalLatitude"))
+points_PSMA_spatial <- vect(points_PSMA_spatial, type = 'points', crs = projection, geom=c("decimalLongitude", "decimalLatitude"))
+points_RALU_spatial <- vect(points_RALU_spatial, type = 'points', crs = projection, geom=c("decimalLongitude", "decimalLatitude"))
 
 # create circles with a radius of 100 km. This is one of those steps that will really be determined based on the species you are interested in.
 ABMA_circles <- buffer(points_ABMA_spatial, 500000)
+ANBO_circles <- buffer(points_ANBO_spatial, 500000)
+ANHE_circles <- buffer(points_ANHE_spatial, 500000)
+LISY_circles <- buffer(points_LISY_spatial, 500000)
+PSMA_circles <- buffer(points_PSMA_spatial, 500000)
+RALU_circles <- buffer(points_RALU_spatial, 500000)
 
-# define the circles as polygons to dissolve. Note: rgeos package is required to dissolve.
-ABMA_poly <- union(ABMA_circles)
+# define the circles as polygons to dissolve after converting. Note: rgeos package is required to dissolve.
+ABMA_poly <- aggregate(ABMA_circles)
+ANBO_poly <- aggregate(ANBO_circles)
+ANHE_poly <- aggregate(ANHE_circles)
+LISY_poly <- aggregate(LISY_circles)
+PSMA_poly <- aggregate(PSMA_circles)
+RALU_poly <- aggregate(RALU_circles)
 
 #crop the raster stack by this shape
+ABMA_predictors <- crop(predictors_final, ABMA_poly)
+ANBO_predictors <- crop(predictors_final, ANBO_poly)
+ANHE_predictors <- crop(predictors_final, ANHE_poly)
+LISY_predictors <- crop(predictors_final, LISY_poly)
+PSMA_predictors <- crop(predictors_final, PSMA_poly)
+RALU_predictors <- crop(predictors_final, RALU_poly)
+
+
+#now write final
+terra::writeRaster(ABMA_predictors, './outputs/data_proc/present_final/ABMA_predictors_final.tiff', filetype = 'GTiff', overwrite=TRUE)
+terra::writeRaster(ANBO_predictors, './outputs/data_proc/present_final/ANBO_predictors_final.tiff', filetype = 'GTiff', overwrite=TRUE)
+terra::writeRaster(ANHE_predictors, './outputs/data_proc/present_final/ANHE_predictors_final.tiff', filetype = 'GTiff', overwrite=TRUE)
+terra::writeRaster(LISY_predictors, './outputs/data_proc/present_final/LISY_predictors_final.tiff', filetype = 'GTiff', overwrite=TRUE)
+terra::writeRaster(PSMA_predictors, './outputs/data_proc/present_final/PSMA_predictors_final.tiff', filetype = 'GTiff', overwrite=TRUE)
+terra::writeRaster(RALU_predictors, './outputs/data_proc/present_final/RALU_predictors_final.tiff', filetype = 'GTiff', overwrite=TRUE)
+
+#important note here: we will use the species specific predictors for Maxent model, but then using the predictors_final for predicting distribution
+
+#next up is going to be future data. note that the tiff for each one has the name of years and SSP
+#create list of env data
+bio_files_future <- list.files(path = './data_raw/future', pattern = '*.tif', all.files = TRUE, full.names = TRUE, recursive = TRUE)
+
+#load in the rasters for the future. 12 files with 19 bioclim layers
+bio_layers_future <- lapply(bio_files_future, function(i) {rast(i)})
+
+#view names of the final predictor list
+names(predictors_final)
+
+#create subset to pull out of the list of rasters. this is slightly different than the nameing format in bio_names from above
+subset_names <- c('wc2_1', 'wc2_18', 'wc2_19', 'wc2_2', 'wc2_3', 'wc2_5', 'wc2_7', 'wc2_8', 'wc2_13', 'wc2_15')
+
+bio_layers_future_sub <- lapply(bio_layers_future, function(i) {subset(i, subset_names)})
+
+#crop all layers to NA to save on disk/computational time, similar to line28
+bio_layers_future_crop <- lapply(bio_layers_future_sub, function(i) {crop(i, ext)})        
+#reproject all layers fails and fills in NAN for everything but the first layer if mask is on. values seem fine though
+bio_layers_future_repro <- lapply(bio_layers_future_crop, function(i) {project(i, projection, method="bilinear")})
+
+#because of this, breaking up
+
+
+
+#going to create the list of names from file list
+future_file_name <- as.data.frame(bio_files_future)
+
+names(filList) <- names(Fil)
+
+list2env(bio_layers_future_crop,envir=.GlobalEnv)
