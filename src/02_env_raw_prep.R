@@ -82,10 +82,10 @@ predictors_final <- subset(bio_layers_repro, names(predictors_final_list))
 #names of rasters in the stack
 bio_names <- names(predictors_final)
 
-terra::writeRaster(predictors_final, './outputs/data_proc/present_repro_nocor/predictors_final.tiff', filetype = 'GTiff',names = bio_names, overwrite=TRUE)
+terra::writeRaster(predictors_final, './outputs/data_proc/present_final/predictors_final.tiff', filetype = 'GTiff',names = bio_names, overwrite=TRUE)
 
-#and to read in
-predictors_final_test <- rast('./outputs/data_proc/present_repro_nocor/predictors_final.tiff')
+#and to read in if needed
+predictors_final <- rast('./outputs/data_proc/present_final/predictors_final.tiff')
 
 #next will be cropping each one for model training so that background extent is not too large
 
@@ -169,13 +169,26 @@ bio_layers_future_crop <- lapply(bio_layers_future_sub, function(i) {crop(i, ext
 #reproject all layers fails and fills in NAN for everything but the first layer if mask is on. values seem fine though
 bio_layers_future_repro <- lapply(bio_layers_future_crop, function(i) {project(i, projection, method="bilinear")})
 
-#because of this, breaking up
+#next is resample to match the resolution of the present day files
+bio_layers_future_resample <- lapply(bio_layers_future_repro, function(i) {resample(i, predictors_final)})
 
-
-
-#going to create the list of names from file list
+#going to create the list of names from file list to name and output
 future_file_name <- as.data.frame(bio_files_future)
 
-names(filList) <- names(Fil)
+future_file_name <- tidyr::separate(data = future_file_name, col = bio_files_future, into = c('1', '2', '3', '4', '5', '6', '7', '8' , '9', '10', '11', '12', '13', 'SSP-year'), sep = "/")
 
-list2env(bio_layers_future_crop,envir=.GlobalEnv)
+names(bio_layers_future_resample) <- future_file_name$`SSP-year`
+
+#write raster with lapply gives a susbcript error, but works fine outside of lapply? going to just write individually for now. may fix later.
+terra::writeRaster(bio_layers_future_resample[[1]], filename=paste('./outputs/data_proc/future_final/', names(bio_layers_future_resample[1]), sep = ''), filetype = 'GTiff')
+terra::writeRaster(bio_layers_future_resample[[2]], filename=paste('./outputs/data_proc/future_final/', names(bio_layers_future_resample[2]), sep = ''), filetype = 'GTiff')
+terra::writeRaster(bio_layers_future_resample[[3]], filename=paste('./outputs/data_proc/future_final/', names(bio_layers_future_resample[3]), sep = ''), filetype = 'GTiff')
+terra::writeRaster(bio_layers_future_resample[[4]], filename=paste('./outputs/data_proc/future_final/', names(bio_layers_future_resample[4]), sep = ''), filetype = 'GTiff')
+terra::writeRaster(bio_layers_future_resample[[5]], filename=paste('./outputs/data_proc/future_final/', names(bio_layers_future_resample[5]), sep = ''), filetype = 'GTiff')
+terra::writeRaster(bio_layers_future_resample[[6]], filename=paste('./outputs/data_proc/future_final/', names(bio_layers_future_resample[6]), sep = ''), filetype = 'GTiff')
+terra::writeRaster(bio_layers_future_resample[[7]], filename=paste('./outputs/data_proc/future_final/', names(bio_layers_future_resample[7]), sep = ''), filetype = 'GTiff')
+terra::writeRaster(bio_layers_future_resample[[8]], filename=paste('./outputs/data_proc/future_final/', names(bio_layers_future_resample[8]), sep = ''), filetype = 'GTiff')
+terra::writeRaster(bio_layers_future_resample[[9]], filename=paste('./outputs/data_proc/future_final/', names(bio_layers_future_resample[9]), sep = ''), filetype = 'GTiff')
+terra::writeRaster(bio_layers_future_resample[[10]], filename=paste('./outputs/data_proc/future_final/', names(bio_layers_future_resample[10]), sep = ''), filetype = 'GTiff')
+terra::writeRaster(bio_layers_future_resample[[11]], filename=paste('./outputs/data_proc/future_final/', names(bio_layers_future_resample[11]), sep = ''), filetype = 'GTiff')
+terra::writeRaster(bio_layers_future_resample[[12]], filename=paste('./outputs/data_proc/future_final/', names(bio_layers_future_resample[12]), sep = ''), filetype = 'GTiff')
