@@ -1,56 +1,62 @@
-#must run 04_maxent.R before running this script
+library(terra)
+library(dismo)
+
+#load up the models
+ABMA_model <- load.model('./outputs/maxent/ABMA/maxent')
+ANBO_model <- load.model('./outputs/maxent/ANBO/maxent')
+ANHE_model <- load.model('./outputs/maxent/ANHE/maxent')
+LISY_model <- load.model('./outputs/maxent/LISY/maxent')
+PSMA_model <- load.model('./outputs/maxent/PSMA/maxent')
+RALU_model <- load.model('./outputs/maxent/RALU/maxent')
+
+#move the Maxent models out of the list and into the environment. name here is then pulled into prediction loops
+model_ls <- c("ABMA_model", "ANBO_model", "ANHE_model", "LISY_model", "PSMA_model", "RALU_model")
+names(MaxEnt_list) <- model_ls
+
+#move to env
+list2env(MaxEnt_list, .GlobalEnv)
 
 #predict to NA present, and future
-ABMA_predict1 <- predict(predictors_final, ABMA_model, progress='text')
+
+for (i in sp_ls) {
+  #predict based on the model for present day
+output_predict <- predict(predictors_final, get(paste(i,'_model', sep ='')), progress='text')
 
 #write the raster after scaling for MigClim. unless space is constraining, write present prediction to each climate scenario output
-ABMA_predict1 <- predict * 1000
-terra::writeRaster(ABMA_predict1, filename='./outputs/maxent/rasters/ssp245/ABMA_hs1', filetype = 'GTiff')
-terra::writeRaster(ABMA_predict1, filename='./outputs/maxent/rasters/ssp370/ABMA_hs1', filetype = 'GTiff')
-terra::writeRaster(ABMA_predict1, filename='./outputs/maxent/rasters/ssp585/ABMA_hs1', filetype = 'GTiff')
+output_predict <- output_predict * 1000
+terra::writeRaster(output_predict, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_hs1', sep=''), filetype = 'GTiff')
+terra::writeRaster(output_predict, filename=paste('./outputs/maxent/rasters/ssp370/',i,'_hs1', sep=''), filetype = 'GTiff')
+terra::writeRaster(output_predict, filename=paste('./outputs/maxent/rasters/ssp585/',i,'_hs1', sep=''), filetype = 'GTiff')
+}
+
 
 #next, predict for the 12 future scenarios
+
+for (i in sp_ls) {
 #ssp245
-ABMA_predict2 <- predict(`ssp245_2021-2040`, ABMA_model, progress='text')
-ABMA_predict2 <- predict * 1000
-terra::writeRaster(ABMA_predict1, filename='./outputs/maxent/rasters/ssp245/ABMA_hs2', filetype = 'GTiff')
-ABMA_predict3 <- predict(`ssp245_2041-2060`, ABMA_model, progress='text')
-ABMA_predict3 <- predict * 1000
-terra::writeRaster(ABMA_predict3, filename='./outputs/maxent/rasters/ssp245/ABMA_hs3', filetype = 'GTiff')
-ABMA_predict4 <- predict(`ssp245_2061-2080`, ABMA_model, progress='text')
-ABMA_predict4 <- predict * 1000
-terra::writeRaster(ABMA_predict4, filename='./outputs/maxent/rasters/ssp245/ABMA_hs4', filetype = 'GTiff')
-ABMA_predict5 <- predict(`ssp245_2081-2100`, ABMA_model, progress='text')
-ABMA_predict5 <- predict * 1000
-terra::writeRaster(ABMA_predict5, filename='./outputs/maxent/rasters/ssp245/ABMA_hs5', filetype = 'GTiff')
+output_predict2 <- predict(`ssp245_2021-2040`, get(paste(i,'model', sep = '')), progress='text')
+output_predict2 <- output_predict2 * 1000
+terra::writeRaster(output_predict2, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_hs2', sep =''), filetype = 'GTiff')
+
+output_predict3 <- predict(`ssp245_2041-2060`, get(paste(i,'model', sep = '')), progress='text')
+output_predict3 <- output_predict3  * 1000
+terra::writeRaster(output_predict3, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_hs3', sep =''), filetype = 'GTiff')
+
+output_predict4 <- predict(`ssp245_2061-2080`, get(paste(i,'model', sep = '')), progress='text')
+output_predict4 <- output_predict4 * 1000
+terra::writeRaster(output_predict4, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_hs4', sep =''), filetype = 'GTiff')
+
+output_predict5 <- predict(`ssp245_2081-2100`, get(paste(i,'model', sep = '')), progress='text')
+output_predict5 <- predict * 1000
+terra::writeRaster(output_predict5, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_hs5', sep =''), filetype = 'GTiff')
+
+}
 
 #ssp370
-ABMA_predict2 <- predict(`ssp370_2021-2040`, ABMA_model, progress='text')
-ABMA_predict2 <- predict * 1000
-terra::writeRaster(ABMA_predict1, filename='./outputs/maxent/rasters/ssp370/ABMA_hs2', filetype = 'GTiff')
-ABMA_predict3 <- predict(`ssp370_2041-2060`, ABMA_model, progress='text')
-ABMA_predict3 <- predict * 1000
-terra::writeRaster(ABMA_predict3, filename='./outputs/maxent/rasters/ssp370/ABMA_hs3', filetype = 'GTiff')
-ABMA_predict4 <- predict(`ssp370_2061-2080`, ABMA_model, progress='text')
-ABMA_predict4 <- predict * 1000
-terra::writeRaster(ABMA_predict4, filename='./outputs/maxent/rasters/ssp370/ABMA_hs4', filetype = 'GTiff')
-ABMA_predict5 <- predict(`ssp370_2081-2100`, ABMA_model, progress='text')
-ABMA_predict5 <- predict * 1000
-terra::writeRaster(ABMA_predict5, filename='./outputs/maxent/rasters/ssp370/ABMA_hs5', filetype = 'GTiff')
 
 #ssp585
-ABMA_predict2 <- predict(`ssp585_2021-2040`, ABMA_model, progress='text')
-ABMA_predict2 <- predict * 1000
-terra::writeRaster(ABMA_predict1, filename='./outputs/maxent/rasters/ssp585/ABMA_hs2', filetype = 'GTiff')
-ABMA_predict3 <- predict(`ssp585_2041-2060`, ABMA_model, progress='text')
-ABMA_predict3 <- predict * 1000
-terra::writeRaster(ABMA_predict3, filename='./outputs/maxent/rasters/ssp585/ABMA_hs3', filetype = 'GTiff')
-ABMA_predict4 <- predict(`ssp585_2061-2080`, ABMA_model, progress='text')
-ABMA_predict4 <- predict * 1000
-terra::writeRaster(ABMA_predict4, filename='./outputs/maxent/rasters/ssp585/ABMA_hs4', filetype = 'GTiff')
-ABMA_predict5 <- predict(`ssp585_2081-2100`, ABMA_model, progress='text')
-ABMA_predict5 <- predict * 1000
-terra::writeRaster(ABMA_predict5, filename='./outputs/maxent/rasters/ssp585/ABMA_hs5', filetype = 'GTiff')
+
+
 
 #last step is to reclassify the initial raster and make it the initial distribution of the species
 ABMA_ini <- reclassify(ABMA_predict1, c(0, 0.25, 0,

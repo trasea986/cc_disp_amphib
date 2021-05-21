@@ -78,24 +78,43 @@ options(java.parameters = "-Xmx4g" )
 
 sp_ls <- c("ABMA", "ANBO", "ANHE", "LISY", "PSMA", "RALU")
 
-ABMA_model <-maxent(x=ABMA_predictors, p=ABMA_points, removeDuplicates=TRUE, args=c(
-  'maximumbackground=10000',
-  'defaultprevalence=1.00',
-  'betamultiplier=0.5',
-  'plots=true',
-  'pictures=true',
-  'randomtestpoints=30',
-  'linear=true',
-  'quadratic=true',
-  'product=false',
-  'threshold=false',
-  'hinge=false',
-  'threads=6',
-  'responsecurves=true',
-  'jackknife=true',
-  'askoverwrite=false'
-),
-path = "./outputs/maxent/ABMA")
+#create a loop to run through all species
 
+#create empty list to save the MaxEnt objects
+MaxEnt_list <- list()
 
+for (i in sp_ls) {
 
+  output_model <- 
+    maxent(x=get(paste(i,'_predictors', sep ='')),
+           p=get(paste(i,'_points', sep ='')),
+           removeDuplicates=TRUE, args=c(
+    'maximumbackground=10000',
+    'defaultprevalence=1.00',
+    'betamultiplier=0.5',
+    'plots=true',
+    'pictures=true',
+    'randomtestpoints=30',
+    'linear=true',
+    'quadratic=true',
+    'product=false',
+    'threshold=false',
+    'hinge=false',
+    'threads=6',
+    'responsecurves=true',
+    'jackknife=true',
+    'askoverwrite=false'
+  ),
+  path = paste("./outputs/maxent/",i, sep =''))
+  
+  MaxEnt_list[[i]] <- output_model
+}
+
+#before doing predictions, going to pull in the variable importance and write to csv.
+
+write.csv(MaxEnt_list[[1]]@results, './outputs/maxent/ABMA_result.csv')
+write.csv(MaxEnt_list[[2]]@results, './outputs/maxent/ANBO_result.csv')
+write.csv(MaxEnt_list[[3]]@results, './outputs/maxent/ANHE_result.csv')
+write.csv(MaxEnt_list[[4]]@results, './outputs/maxent/LISY_result.csv')
+write.csv(MaxEnt_list[[5]]@results, './outputs/maxent/PSMA_result.csv')
+write.csv(MaxEnt_list[[6]]@results, './outputs/maxent/RALU_result.csv')
