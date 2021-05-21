@@ -1,21 +1,20 @@
 library(terra)
+library(tidyverse)
 library(ENMeval)
+#for some reason the next two are required by ENMeval but did not install or load when I updated the package, so manual load
 library(ecospat)
 library(rangeModelMetadata)
-
-#defining projection object in case this is run not after complete the 01 script
-projection <- "ESRI:102008"
 
 #start by bringing in the final point file for all fo the species
 points_all_sp <- read.csv('./outputs/data_proc/cleaned_points.csv')
 
 #need to break up points to individual species
-ABMA_points <- points_all_sp %>% filter(species == 'Ambystoma macrodactylum')
-ANBO_points <- points_all_sp %>% filter(species == 'Anaxyrus boreas')
-ANHE_points <- points_all_sp %>% filter(species == 'Anaxyrus hemiophrys')
-LISY_points <- points_all_sp %>% filter(species == 'Lithobates sylvaticus')
-PSMA_points <- points_all_sp %>% filter(species == 'Pseudacris maculata')
-RALU_points <- points_all_sp %>% filter(species == 'Rana luteiventris')
+ABMA_points <- points_all_sp %>% dplyr::filter(species == 'Ambystoma macrodactylum')
+ANBO_points <- points_all_sp %>% dplyr::filter(species == 'Anaxyrus boreas')
+ANHE_points <- points_all_sp %>% dplyr::filter(species == 'Anaxyrus hemiophrys')
+LISY_points <- points_all_sp %>% dplyr::filter(species == 'Lithobates sylvaticus')
+PSMA_points <- points_all_sp %>% dplyr::filter(species == 'Pseudacris maculata')
+RALU_points <- points_all_sp %>% dplyr::filter(species == 'Rana luteiventris')
 
 ABMA_points$species <- NULL
 ANBO_points$species <- NULL
@@ -35,7 +34,7 @@ RALU_predictors <- raster::stack('./outputs/data_proc/present_final/RALU_predict
 
 #Next is to run ENMeval to check regularization multiplier values
 #set up model list to test
-tune_args_list  <- list(fc = c("L","LQ","LQH","H"), rm = 1:5)
+tune_args_list  <- list(fc = c("L","Q","LQ","LQH", "H"), rm = 1:5)
 
 #running enmeval independently to make watching progress easier
 enmeval_results_ABMA <- ENMevaluate(ABMA_points, ABMA_predictors, n.bg=10000, tune.args = tune_args_list, partitions='checkerboard2', algorithm='maxnet')

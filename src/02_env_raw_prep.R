@@ -179,7 +179,7 @@ future_file_name <- tidyr::separate(data = future_file_name, col = bio_files_fut
 
 names(bio_layers_future_resample) <- future_file_name$`SSP-year`
 
-#write raster with lapply gives a susbcript error, but works fine outside of lapply? going to just write individually for now. may fix later.
+#write raster with lapply gives a subscript error, but works fine outside of lapply? going to just write individually for now. may fix later.
 terra::writeRaster(bio_layers_future_resample[[1]], filename=paste('./outputs/data_proc/future_final/', names(bio_layers_future_resample[1]), sep = ''), filetype = 'GTiff')
 terra::writeRaster(bio_layers_future_resample[[2]], filename=paste('./outputs/data_proc/future_final/', names(bio_layers_future_resample[2]), sep = ''), filetype = 'GTiff')
 terra::writeRaster(bio_layers_future_resample[[3]], filename=paste('./outputs/data_proc/future_final/', names(bio_layers_future_resample[3]), sep = ''), filetype = 'GTiff')
