@@ -83,6 +83,7 @@ sp_ls <- c("ABMA", "ANBO", "ANHE", "LISY", "PSMA", "RALU")
 #create empty list to save the MaxEnt objects
 MaxEnt_list <- list()
 
+#originally for looped this, but each one has its optimized RM and features so might need to change
 for (i in sp_ls) {
 
   output_model <- 
