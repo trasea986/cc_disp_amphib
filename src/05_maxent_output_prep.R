@@ -170,3 +170,7 @@ writeRaster(ANHE_ini, filename='./outputs/maxent/ANHE_ini', format="GTiff", over
 writeRaster(LISY_ini, filename='./outputs/maxent/LISY_ini', format="GTiff", overwrite = TRUE)
 writeRaster(PSMA_ini, filename='./outputs/maxent/PSMA_ini', format="GTiff", overwrite = TRUE)
 writeRaster(RALU_ini, filename='./outputs/maxent/RALU_ini', format="GTiff", overwrite = TRUE)
+
+
+#last step is to set up the souther range initial distribution file
+#going to do this by loading in the IUCN range, buffering around it, and then masking the ENM
