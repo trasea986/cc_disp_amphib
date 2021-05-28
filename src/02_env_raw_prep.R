@@ -19,6 +19,9 @@ points_all_sp <- points_all_sp %>% dplyr::select(species, everything())
 #create list of env data
 bio_files <- list.files(path = './data_raw/present', pattern = '*.tif', all.files = TRUE, full.names = TRUE)
 
+
+
+
 #load in the rasters
 bio_layers <- rast(bio_files)
 

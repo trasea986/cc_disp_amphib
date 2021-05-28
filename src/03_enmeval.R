@@ -5,6 +5,11 @@ library(ENMeval)
 library(ecospat)
 library(rangeModelMetadata)
 
+#this script largely will not work due to memory issues, and will need to have the parts run on the cluster. even on a cluster, LISY is problematic
+
+#see bottom of script for importing the outputs from the cluster to determine best models for 04_maxent.R
+
+
 #start by bringing in the final point file for all fo the species
 points_all_sp <- read.csv('./outputs/data_proc/cleaned_points.csv')
 
