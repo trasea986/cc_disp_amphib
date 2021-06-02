@@ -74,44 +74,185 @@ RALU_points <- RALU_points %>% select('decimalLongitude', 'decimalLatitude')
 #give java extra memory
 options(java.parameters = "-Xmx4g" )
 
-#species shorthand... maybe port this at the start to speed up some of the tasks above.
+#species shorthand... maybe port this to the start to speed up some of the tasks above.
 
 sp_ls <- c("ABMA", "ANBO", "ANHE", "LISY", "PSMA", "RALU")
 
 #create a loop to run through all species
 
-#create empty list to save the MaxEnt objects
-MaxEnt_list <- list()
+#create empty list to save the MaxEnt objects if running in a loop
+#MaxEnt_list <- list()
 
-#originally for looped this, but each one has its optimized RM and features so might need to change
-for (i in sp_ls) {
+#originally looped this, but each one has its optimized RM and features post-ENMeval. Also set random number of points for training as 20% of total point number
 
-  output_model <- 
-    maxent(x=get(paste(i,'_predictors', sep ='')),
-           p=get(paste(i,'_points', sep ='')),
-           removeDuplicates=TRUE, args=c(
-    'maximumbackground=10000',
-    'defaultprevalence=1.00',
-    'betamultiplier=0.5',
-    'plots=true',
-    'pictures=true',
-    'randomtestpoints=30',
-    'linear=true',
-    'quadratic=true',
+#this is example code for the loop
+
+#for (i in sp_ls) {
+#  output_model <- 
+#    maxent(x=get(paste(i,'_predictors', sep ='')),
+#           p=get(paste(i,'_points', sep ='')),
+#           removeDuplicates=TRUE, args=c(
+#    'maximumbackground=10000',
+#    'defaultprevalence=1.00',
+#    'betamultiplier=0.5',
+#    'plots=true',
+#    'pictures=true',
+#    'randomtestpoints=30',
+#    'linear=true',
+#    'quadratic=true',
+#    'product=false',
+#    'threshold=false',
+#    'hinge=false',
+#    'threads=6',
+#    'responsecurves=true',
+#    'jackknife=true',
+#    'askoverwrite=false'
+#  ),
+#  path = paste("./outputs/maxent/",i, sep =''))
+  
+#  MaxEnt_list[[i]] <- output_model
+#}
+
+
+ABMA_model <- 
+      maxent(x=ABMA_predictors,
+             p=ABMA_points,
+             removeDuplicates=TRUE, args=c(
+      'maximumbackground=10000',
+      'defaultprevalence=1.00',
+      'betamultiplier=1',
+      'plots=true',
+      'pictures=true',
+      'linear=false',
+      'quadratic=false',
     'product=false',
     'threshold=false',
-    'hinge=false',
+    'hinge=true',
     'threads=6',
     'responsecurves=true',
     'jackknife=true',
-    'askoverwrite=false'
-  ),
-  path = paste("./outputs/maxent/",i, sep =''))
-  
-  MaxEnt_list[[i]] <- output_model
-}
+    'askoverwrite=false',
+    'replicates=10',
+    'replicatetype=crossvalidate'),
+    path = './outputs/maxent/ABMA')
+
+
+ANBO_model <- 
+  maxent(x=ANBO_predictors,
+         p=ANBO_points,
+         removeDuplicates=TRUE, args=c(
+           'maximumbackground=10000',
+           'defaultprevalence=1.00',
+           'betamultiplier=1',
+           'plots=true',
+           'pictures=true',
+           'linear=true',
+           'quadratic=true',
+           'product=false',
+           'threshold=false',
+           'hinge=true',
+           'threads=6',
+           'responsecurves=true',
+           'jackknife=true',
+           'askoverwrite=false',
+           'replicates=10',
+           'replicatetype=crossvalidate'),
+         path = './outputs/maxent/ANBO')
+
+#ANHE is tricky, based on weights, two very similar models at almost 0.5 and 0.5, went with the one with the lower number of coefficients
+
+ANHE_model <- 
+  maxent(x=ANHE_predictors,
+         p=ANHE_points,
+         removeDuplicates=TRUE, args=c(
+           'maximumbackground=10000',
+           'defaultprevalence=1.00',
+           'betamultiplier=1',
+           'plots=true',
+           'pictures=true',
+           'linear=true',
+           'quadratic=true',
+           'product=false',
+           'threshold=false',
+           'hinge=true',
+           'threads=6',
+           'responsecurves=true',
+           'jackknife=true',
+           'askoverwrite=false',
+           'replicates=10',
+           'replicatetype=crossvalidate'),
+         path = './outputs/maxent/ANHE')
+
+LISY_model <- 
+  maxent(x=LISY_predictors,
+         p=LISY_points,
+         removeDuplicates=TRUE, args=c(
+           'maximumbackground=10000',
+           'defaultprevalence=1.00',
+           'betamultiplier=0.5',
+           'plots=true',
+           'pictures=true',
+           'linear=true',
+           'quadratic=true',
+           'product=false',
+           'threshold=false',
+           'hinge=true',
+           'threads=6',
+           'responsecurves=true',
+           'jackknife=true',
+           'askoverwrite=false',
+           'replicates=10',
+           'replicatetype=crossvalidate'),
+         path = './outputs/maxent/LISY')
+
+PSMA_model <- 
+  maxent(x=PSMA_predictors,
+         p=PSMA_points,
+         removeDuplicates=TRUE, args=c(
+           'maximumbackground=10000',
+           'defaultprevalence=1.00',
+           'betamultiplier=0.5',
+           'plots=true',
+           'pictures=true',
+           'linear=false',
+           'quadratic=false',
+           'product=false',
+           'threshold=false',
+           'hinge=true',
+           'threads=6',
+           'responsecurves=true',
+           'jackknife=true',
+           'askoverwrite=false',
+           'replicates=10',
+           'replicatetype=crossvalidate'),
+         path = './outputs/maxent/PSMA')
+
+RALU_model <- 
+  maxent(x=RALU_predictors,
+         p=RALU_points,
+         removeDuplicates=TRUE, args=c(
+           'maximumbackground=10000',
+           'defaultprevalence=1.00',
+           'betamultiplier=2',
+           'plots=true',
+           'pictures=true',
+           'linear=true',
+           'quadratic=true',
+           'product=false',
+           'threshold=false',
+           'hinge=true',
+           'threads=6',
+           'responsecurves=true',
+           'jackknife=true',
+           'askoverwrite=false',
+           'replicates=10',
+           'replicatetype=crossvalidate'),
+         path = './outputs/maxent/RALU')
 
 #before doing predictions, going to pull in the variable importance and write to csv.
+
+MaxEnt_list <- list(ABMA_model, ANBO_model, ANHE_model, LISY_model, PSMA_model, RALU_model)
+
 
 write.csv(MaxEnt_list[[1]]@results, './outputs/maxent/ABMA_result.csv')
 write.csv(MaxEnt_list[[2]]@results, './outputs/maxent/ANBO_result.csv')
