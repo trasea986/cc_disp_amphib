@@ -1,87 +1,122 @@
 #04 must be run first before doing this script
 
-#move the Maxent models out of the list and into the environment. name here is then pulled into prediction loops
-model_ls <- c("ABMA_model", "ANBO_model", "ANHE_model", "LISY_model", "PSMA_model", "RALU_model")
-names(MaxEnt_list) <- model_ls
-
-#move to env
-list2env(MaxEnt_list, .GlobalEnv)
+#move the Maxent models out of the list and into the environment. name here is then pulled into prediction loops. this section is only needed if 04_maxent.R was done with the loop (only appropriate if ENMeval results show same model parameters lowest AIC)
+#model_ls <- c("ABMA_model", "ANBO_model", "ANHE_model", "LISY_model", "PSMA_model", "RALU_model")
+#names(MaxEnt_list) <- model_ls
+#move to env. only needed if the loop in 04_maxent.R was used
+#list2env(MaxEnt_list, .GlobalEnv)
 
 #predict to NA present, and future
 
+#determine which model had the best AUC, note that first in sequence is 0
+colnames(as.data.frame(ABMA_model@results))[max.col(as.data.frame(ABMA_model@results)[c("Test.AUC"),],ties.method="first")]
+colnames(as.data.frame(ANBO_model@results))[max.col(as.data.frame(ANBO_model@results)[c("Test.AUC"),],ties.method="first")]
+colnames(as.data.frame(ANHE_model@results))[max.col(as.data.frame(ANHE_model@results)[c("Test.AUC"),],ties.method="first")]
+colnames(as.data.frame(LISY_model@results))[max.col(as.data.frame(LISY_model@results)[c("Test.AUC"),],ties.method="first")]
+colnames(as.data.frame(PSMA_model@results))[max.col(as.data.frame(PSMA_model@results)[c("Test.AUC"),],ties.method="first")]
+colnames(as.data.frame(RALU_model@results))[max.col(as.data.frame(RALU_model@results)[c("Test.AUC"),],ties.method="first")]
+
+#subset MaxEntReplicates to just the best performing model
+ABMA_model_best <- ABMA_model@models[[3]]
+ANBO_model_best <- ANBO_model@models[[10]]
+ANHE_model_best <- ANHE_model@models[[3]]
+LISY_model_best <- LISY_model@models[[1]]
+PSMA_model_best <- PSMA_model@models[[8]]
+RALU_model_best <- RALU_model@models[[2]]
+
+#save the best model for each species
+saveRDS(ABMA_model_best, file = "./outputs/maxent/ABMA_best.rds")
+saveRDS(ANBO_model_best, file = "./outputs/maxent/ANBO_best.rds")
+saveRDS(ANHE_model_best, file = "./outputs/maxent/ANHE_best.rds")
+saveRDS(LISY_model_best, file = "./outputs/maxent/LISY_best.rds")
+saveRDS(PSMA_model_best, file = "./outputs/maxent/PSMA_best.rds")
+saveRDS(RALU_model_best, file = "./outputs/maxent/RALU_best.rds")
+
+#load in best model if needed
+#ABMA_model_best <- readRDS("./outputs/maxent/ABMA_best.rds")
+#ANBO_model_best <- readRDS("./outputs/maxent/ANBO_best.rds")
+#ANHE_model_best <- readRDS("./outputs/maxent/ANHE_best.rds")
+#LISY_model_best <- readRDS("./outputs/maxent/LISY_best.rds")
+#PSMA_model_best <- readRDS("./outputs/maxent/PSMA_best.rds")
+#RALU_model_best <- readRDS("./outputs/maxent/RALU_best.rds")
+
 for (i in sp_ls) {
   #predict based on the model for present day
-output_predict <- predict(predictors_final, get(paste(i,'_model', sep ='')), progress='text')
+output_predict <- predict(predictors_final, get(paste(i,'_model_best', sep ='')), progress='text')
 
-#write the raster after scaling for MigClim. unless space is constraining, write present prediction to each climate scenario output
+#write the raster after scaling for MigClim. unless space is constraining, write present prediction to each climate scenario output. need one hs1 in each directory which will not change across models.
 output_predict <- output_predict * 1000
-terra::writeRaster(output_predict, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_hs1', sep=''), filetype = 'GTiff')
-terra::writeRaster(output_predict, filename=paste('./outputs/maxent/rasters/ssp370/',i,'_hs1', sep=''), filetype = 'GTiff')
-terra::writeRaster(output_predict, filename=paste('./outputs/maxent/rasters/ssp585/',i,'_hs1', sep=''), filetype = 'GTiff')
+terra::writeRaster(output_predict, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_hs1.tif', sep=''), filetype = 'GTiff')
+terra::writeRaster(output_predict, filename=paste('./outputs/maxent/rasters/ssp370/',i,'_hs1.tif', sep=''), filetype = 'GTiff')
+terra::writeRaster(output_predict, filename=paste('./outputs/maxent/rasters/ssp585/',i,'_hs1.tif', sep=''), filetype = 'GTiff')
 }
 
 #will then actually load in the predictors for later steps
-ABMA_present_SDM <- raster('./outputs/maxent/rasters/ssp245/ABMA_hs1') 
-ANBO_present_SDM <- raster('./outputs/maxent/rasters/ssp245/ANBO_hs1')
-ANHE_present_SDM <- raster('./outputs/maxent/rasters/ssp245/ANHE_hs1')
-LISY_present_SDM <- raster('./outputs/maxent/rasters/ssp245/LISY_hs1')
-PSMA_present_SDM <- raster('./outputs/maxent/rasters/ssp245/PSMA_hs1')
-RALU_present_SDM <- raster('./outputs/maxent/rasters/ssp245/RALU_hs1')
+ABMA_present_SDM <- raster('./outputs/maxent/rasters/ssp245/ABMA_hs1.tif') 
+ANBO_present_SDM <- raster('./outputs/maxent/rasters/ssp245/ANBO_hs1.tif')
+ANHE_present_SDM <- raster('./outputs/maxent/rasters/ssp245/ANHE_hs1.tif')
+LISY_present_SDM <- raster('./outputs/maxent/rasters/ssp245/LISY_hs1.tif')
+PSMA_present_SDM <- raster('./outputs/maxent/rasters/ssp245/PSMA_hs1.tif')
+RALU_present_SDM <- raster('./outputs/maxent/rasters/ssp245/RALU_hs1.tif')
 
 #next, predict for the 12 future scenarios
 #maybe nested loop for the 3 ssps at a later date
 
 for (i in sp_ls) {
 #ssp245
-output_predict2 <- predict(`ssp245_2021-2040`, get(paste(i,'model', sep = '')), progress='text')
+output_predict2 <- predict(`ssp245_2021-2040`, get(paste(i,'model_best', sep = '')), progress='text')
 output_predict2 <- output_predict2 * 1000
-terra::writeRaster(output_predict2, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_hs2', sep =''), filetype = 'GTiff')
+terra::writeRaster(output_predict2, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_hs2.tif', sep =''), filetype = 'GTiff')
 
-output_predict3 <- predict(`ssp245_2041-2060`, get(paste(i,'model', sep = '')), progress='text')
+output_predict3 <- predict(`ssp245_2041-2060`, get(paste(i,'model_best', sep = '')), progress='text')
 output_predict3 <- output_predict3  * 1000
-terra::writeRaster(output_predict3, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_hs3', sep =''), filetype = 'GTiff')
+terra::writeRaster(output_predict3, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_hs3.tif', sep =''), filetype = 'GTiff')
 
-output_predict4 <- predict(`ssp245_2061-2080`, get(paste(i,'model', sep = '')), progress='text')
+output_predict4 <- predict(`ssp245_2061-2080`, get(paste(i,'model_best', sep = '')), progress='text')
 output_predict4 <- output_predict4 * 1000
-terra::writeRaster(output_predict4, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_hs4', sep =''), filetype = 'GTiff')
+terra::writeRaster(output_predict4, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_hs4.tif', sep =''), filetype = 'GTiff')
 
-output_predict5 <- predict(`ssp245_2081-2100`, get(paste(i,'model', sep = '')), progress='text')
+output_predict5 <- predict(`ssp245_2081-2100`, get(paste(i,'model_best', sep = '')), progress='text')
 output_predict5 <- predict * 1000
-terra::writeRaster(output_predict5, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_hs5', sep =''), filetype = 'GTiff')
+terra::writeRaster(output_predict5, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_hs5.tif', sep =''), filetype = 'GTiff')
+}
 
+for (i in sp_ls) {
 #ssp370
-output_predict2 <- predict(`ssp370_2021-2040`, get(paste(i,'model', sep = '')), progress='text')
+output_predict2 <- predict(`ssp370_2021-2040`, get(paste(i,'model_best', sep = '')), progress='text')
 output_predict2 <- output_predict2 * 1000
-terra::writeRaster(output_predict2, filename=paste('./outputs/maxent/rasters/ssp370/',i,'_hs2', sep =''), filetype = 'GTiff')
+terra::writeRaster(output_predict2, filename=paste('./outputs/maxent/rasters/ssp370/',i,'_hs2.tif', sep =''), filetype = 'GTiff')
 
-output_predict3 <- predict(`ssp370_2041-2060`, get(paste(i,'model', sep = '')), progress='text')
+output_predict3 <- predict(`ssp370_2041-2060`, get(paste(i,'model_best', sep = '')), progress='text')
 output_predict3 <- output_predict3  * 1000
-terra::writeRaster(output_predict3, filename=paste('./outputs/maxent/rasters/ssp370/',i,'_hs3', sep =''), filetype = 'GTiff')
+terra::writeRaster(output_predict3, filename=paste('./outputs/maxent/rasters/ssp370/',i,'_hs3.tif', sep =''), filetype = 'GTiff')
 
-output_predict4 <- predict(`ssp370_2061-2080`, get(paste(i,'model', sep = '')), progress='text')
+output_predict4 <- predict(`ssp370_2061-2080`, get(paste(i,'model_best', sep = '')), progress='text')
 output_predict4 <- output_predict4 * 1000
-terra::writeRaster(output_predict4, filename=paste('./outputs/maxent/rasters/ssp370/',i,'_hs4', sep =''), filetype = 'GTiff')
+terra::writeRaster(output_predict4, filename=paste('./outputs/maxent/rasters/ssp370/',i,'_hs4.tif', sep =''), filetype = 'GTiff')
 
-output_predict5 <- predict(`ssp370_2081-2100`, get(paste(i,'model', sep = '')), progress='text')
+output_predict5 <- predict(`ssp370_2081-2100`, get(paste(i,'model_best', sep = '')), progress='text')
 output_predict5 <- predict * 1000
-terra::writeRaster(output_predict5, filename=paste('./outputs/maxent/rasters/ssp370/',i,'_hs5', sep =''), filetype = 'GTiff')
+terra::writeRaster(output_predict5, filename=paste('./outputs/maxent/rasters/ssp370/',i,'_hs5.tif', sep =''), filetype = 'GTiff')
+}
 
+for (i in sp_ls) {
 #ssp585
-output_predict2 <- predict(`ssp585_2021-2040`, get(paste(i,'model', sep = '')), progress='text')
+output_predict2 <- predict(`ssp585_2021-2040`, get(paste(i,'model_best', sep = '')), progress='text')
 output_predict2 <- output_predict2 * 1000
-terra::writeRaster(output_predict2, filename=paste('./outputs/maxent/rasters/ssp585/',i,'_hs2', sep =''), filetype = 'GTiff')
+terra::writeRaster(output_predict2, filename=paste('./outputs/maxent/rasters/ssp585/',i,'_hs2.tif', sep =''), filetype = 'GTiff')
 
-output_predict3 <- predict(`ssp585_2041-2060`, get(paste(i,'model', sep = '')), progress='text')
+output_predict3 <- predict(`ssp585_2041-2060`, get(paste(i,'model_best', sep = '')), progress='text')
 output_predict3 <- output_predict3  * 1000
-terra::writeRaster(output_predict3, filename=paste('./outputs/maxent/rasters/ssp585/',i,'_hs3', sep =''), filetype = 'GTiff')
+terra::writeRaster(output_predict3, filename=paste('./outputs/maxent/rasters/ssp585/',i,'_hs3.tif', sep =''), filetype = 'GTiff')
 
-output_predict4 <- predict(`ssp585_2061-2080`, get(paste(i,'model', sep = '')), progress='text')
+output_predict4 <- predict(`ssp585_2061-2080`, get(paste(i,'model_best', sep = '')), progress='text')
 output_predict4 <- output_predict4 * 1000
-terra::writeRaster(output_predict4, filename=paste('./outputs/maxent/rasters/ssp585/',i,'_hs4', sep =''), filetype = 'GTiff')
+terra::writeRaster(output_predict4, filename=paste('./outputs/maxent/rasters/ssp585/',i,'_hs4.tif', sep =''), filetype = 'GTiff')
 
-output_predict5 <- predict(`ssp585_2081-2100`, get(paste(i,'model', sep = '')), progress='text')
+output_predict5 <- predict(`ssp585_2081-2100`, get(paste(i,'model_best', sep = '')), progress='text')
 output_predict5 <- predict * 1000
-terra::writeRaster(output_predict5, filename=paste('./outputs/maxent/rasters/ssp585/',i,'_hs5', sep =''), filetype = 'GTiff')
+terra::writeRaster(output_predict5, filename=paste('./outputs/maxent/rasters/ssp585/',i,'_hs5.tif', sep =''), filetype = 'GTiff')
 
 }
 
@@ -90,10 +125,10 @@ terra::writeRaster(output_predict5, filename=paste('./outputs/maxent/rasters/ssp
 
 #for each species, going to calculate the mean and standard deviation for the ENM values for the present day raster
 
-#also going to take each species specific background data for the initial distribution
+#also going to take each species specific background data for the initial distribution, so this isn't the entire area like above by using the species specific extent
 for (i in sp_ls) {
   #predict based on the model for present day
-  output_predict <- predict(get(paste(i,'_predictors', sep='')), get(paste(i,'_model', sep ='')), progress='text')
+  output_predict <- predict(get(paste(i,'_predictors', sep='')), get(paste(i,'_model_best', sep ='')), progress='text')
   
   #write the raster after scaling for MigClim. unless space is constraining, write present prediction to each climate scenario output
   output_predict <- output_predict * 1000
@@ -142,32 +177,33 @@ RALU_ENM_values <- as.data.frame(RALU_ENM_values)
 
 #calculate mean at occupancy value and subtract one standard deviation to determine the thresholds for the initial distribution
 
-mean(ABMA_ENM_values[complete.cases(ABMA_ENM_values), ]) - sd(ABMA_ENM_values[complete.cases(ABMA_ENM_values), ])
-mean(ANBO_ENM_values[complete.cases(ANBO_ENM_values), ]) - sd(ANBO_ENM_values[complete.cases(ANBO_ENM_values), ])
-mean(ANHE_ENM_values[complete.cases(ANHE_ENM_values), ]) - sd(ANHE_ENM_values[complete.cases(ANHE_ENM_values), ])
-mean(LISY_ENM_values[complete.cases(LISY_ENM_values), ]) - sd(LISY_ENM_values[complete.cases(LISY_ENM_values), ])
-mean(PSMA_ENM_values[complete.cases(PSMA_ENM_values), ]) - sd(PSMA_ENM_values[complete.cases(PSMA_ENM_values), ])
-mean(RALU_ENM_values[complete.cases(RALU_ENM_values), ]) - sd(RALU_ENM_values[complete.cases(RALU_ENM_values), ])
+ABMA_quant <- quantile(ABMA_ENM_values, probs = 0.10, na.rm = TRUE)
+ANBO_quant <- quantile(ANBO_ENM_values, probs = 0.10, na.rm = TRUE)
+ANHE_quant <- quantile(ANHE_ENM_values, probs = 0.10, na.rm = TRUE)
+LISY_quant <- quantile(LISY_ENM_values, probs = 0.10, na.rm = TRUE)
+PSMA_quant <- quantile(PSMA_ENM_values, probs = 0.10, na.rm = TRUE)
+RALU_quant <- quantile(RALU_ENM_values, probs = 0.10, na.rm = TRUE)
 
-ABMA_ini <- raster::reclassify(ABMA_ini_SDM, c(0, 307, 0,
-                                           307.00001, 1000, 1))
-ANBO_ini <- reclassify(ANBO_ini_SDM, c(0, 391, 0,
-                                        391, 1000, 1))
-ANHE_ini <- reclassify(ANHE_ini_SDM, c(0, 347, 0,
-                                        347, 1000, 1))
-LISY_ini <- reclassify(LISY_ini_SDM, c(0, 461, 0,
-                                        461, 1000, 1))
-PSMA_ini <- reclassify(PSMA_ini_SDM, c(0, 436, 0,
-                                        434, 1000, 1))
-RALU_ini <- reclassify(RALU_ini_SDM, c(0, 391, 0,
-                                        391, 1000, 1))
 
-writeRaster(ABMA_ini, filename='./outputs/maxent/ABMA_ini', format="GTiff", overwrite = TRUE)
-writeRaster(ANBO_ini, filename='./outputs/maxent/ANBO_ini', format="GTiff", overwrite = TRUE)
-writeRaster(ANHE_ini, filename='./outputs/maxent/ANHE_ini', format="GTiff", overwrite = TRUE)
-writeRaster(LISY_ini, filename='./outputs/maxent/LISY_ini', format="GTiff", overwrite = TRUE)
-writeRaster(PSMA_ini, filename='./outputs/maxent/PSMA_ini', format="GTiff", overwrite = TRUE)
-writeRaster(RALU_ini, filename='./outputs/maxent/RALU_ini', format="GTiff", overwrite = TRUE)
+ABMA_ini <- reclassify(ABMA_ini_SDM, c(0, ABMA_quant, 0,
+                                               ABMA_quant, 1000, 1))
+ANBO_ini <- reclassify(ANBO_ini_SDM, c(0, ANBO_quant, 0,
+                                       ANBO_quant, 1000, 1))
+ANHE_ini <- reclassify(ANHE_ini_SDM, c(0, ANHE_quant, 0,
+                                       ANHE_quant, 1000, 1))
+LISY_ini <- reclassify(LISY_ini_SDM, c(0, LISY_quant, 0,
+                                       LISY_quant, 1000, 1))
+PSMA_ini <- reclassify(PSMA_ini_SDM, c(0, PSMA_quant, 0,
+                                       PSMA_quant, 1000, 1))
+RALU_ini <- reclassify(RALU_ini_SDM, c(0, RALU_quant, 0,
+                                       RALU_quant, 1000, 1))
+
+writeRaster(ABMA_ini, filename='./outputs/maxent/ABMA_ini.tif', format="GTiff", overwrite = TRUE)
+writeRaster(ANBO_ini, filename='./outputs/maxent/ANBO_ini.tif', format="GTiff", overwrite = TRUE)
+writeRaster(ANHE_ini, filename='./outputs/maxent/ANHE_ini.tif', format="GTiff", overwrite = TRUE)
+writeRaster(LISY_ini, filename='./outputs/maxent/LISY_ini.tif', format="GTiff", overwrite = TRUE)
+writeRaster(PSMA_ini, filename='./outputs/maxent/PSMA_ini.tif', format="GTiff", overwrite = TRUE)
+writeRaster(RALU_ini, filename='./outputs/maxent/RALU_ini.tif', format="GTiff", overwrite = TRUE)
 
 
 #last step is to set up the southern range initial distribution file
@@ -255,22 +291,22 @@ LISY_ini_south_SDM <- raster(LISY_ini_south_SDM)
 PSMA_ini_south_SDM <- raster(PSMA_ini_south_SDM)
 RALU_ini_south_SDM <- raster(RALU_ini_south_SDM)
 
-ABMA_ini_south <- reclassify(ABMA_ini_south_SDM, c(-1, 307, 0,
-                                               307, 1000, 1))
-ANBO_ini_south <- reclassify(ANBO_ini_south_SDM, c(0, 391, 0,
-                                       391, 1000, 1))
-ANHE_ini_south <- reclassify(ANHE_ini_south_SDM, c(0, 347, 0,
-                                       347, 1000, 1))
-LISY_ini_south <- reclassify(LISY_ini_south_SDM, c(0, 461, 0,
-                                       461, 1000, 1))
-PSMA_ini_south <- reclassify(PSMA_ini_south_SDM, c(0, 436, 0,
-                                       434, 1000, 1))
-RALU_ini_south <- reclassify(RALU_ini_south_SDM, c(0, 391, 0,
-                                       391, 1000, 1))
+ABMA_ini_south <- reclassify(ABMA_ini_south_SDM, c(-1, ABMA_quant, 0,
+                                                   ABMA_quant, 1000, 1))
+ANBO_ini_south <- reclassify(ANBO_ini_south_SDM, c(0, ANBO_quant, 0,
+                                                   ANBO_quant, 1000, 1))
+ANHE_ini_south <- reclassify(ANHE_ini_south_SDM, c(0, ANHE_quant, 0,
+                                                   ANHE_quant, 1000, 1))
+LISY_ini_south <- reclassify(LISY_ini_south_SDM, c(0, LISY_quant, 0,
+                                                   LISY_quant, 1000, 1))
+PSMA_ini_south <- reclassify(PSMA_ini_south_SDM, c(0, PSMA_quant, 0,
+                                                   PSMA_quant, 1000, 1))
+RALU_ini_south <- reclassify(RALU_ini_south_SDM, c(0, RALU_quant, 0,
+                                                   RALU_quant, 1000, 1))
 
-writeRaster(ABMA_ini_south, filename='./outputs/maxent/ABMA_ini_south', format="GTiff", overwrite = TRUE)
-writeRaster(ANBO_ini_south, filename='./outputs/maxent/ANBO_ini_south', format="GTiff", overwrite = TRUE)
-writeRaster(ANHE_ini_south, filename='./outputs/maxent/ANHE_ini_south', format="GTiff", overwrite = TRUE)
-writeRaster(LISY_ini_south, filename='./outputs/maxent/LISY_ini_south', format="GTiff", overwrite = TRUE)
-writeRaster(PSMA_ini_south, filename='./outputs/maxent/PSMA_ini_south', format="GTiff", overwrite = TRUE)
-writeRaster(RALU_ini_south, filename='./outputs/maxent/RALU_ini_south', format="GTiff", overwrite = TRUE)
+writeRaster(ABMA_ini_south, filename='./outputs/maxent/ABMA_ini_south.tif', format="GTiff", overwrite = TRUE)
+writeRaster(ANBO_ini_south, filename='./outputs/maxent/ANBO_ini_south.tif', format="GTiff", overwrite = TRUE)
+writeRaster(ANHE_ini_south, filename='./outputs/maxent/ANHE_ini_south.tif', format="GTiff", overwrite = TRUE)
+writeRaster(LISY_ini_south, filename='./outputs/maxent/LISY_ini_south.tif', format="GTiff", overwrite = TRUE)
+writeRaster(PSMA_ini_south, filename='./outputs/maxent/PSMA_ini_south.tif', format="GTiff", overwrite = TRUE)
+writeRaster(RALU_ini_south, filename='./outputs/maxent/RALU_ini_south.tif', format="GTiff", overwrite = TRUE)
