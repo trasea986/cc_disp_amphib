@@ -1,4 +1,6 @@
-#04 must be run first before doing this script
+library(dismo)
+
+sp_ls <- c("ABMA", "ANBO", "ANHE", "LISY", "PSMA", "RALU")
 
 #move the Maxent models out of the list and into the environment. name here is then pulled into prediction loops. this section is only needed if 04_maxent.R was done with the loop (only appropriate if ENMeval results show same model parameters lowest AIC)
 #model_ls <- c("ABMA_model", "ANBO_model", "ANHE_model", "LISY_model", "PSMA_model", "RALU_model")
@@ -33,12 +35,12 @@ saveRDS(PSMA_model_best, file = "./outputs/maxent/PSMA_best.rds")
 saveRDS(RALU_model_best, file = "./outputs/maxent/RALU_best.rds")
 
 #load in best model if needed
-#ABMA_model_best <- readRDS("./outputs/maxent/ABMA_best.rds")
-#ANBO_model_best <- readRDS("./outputs/maxent/ANBO_best.rds")
-#ANHE_model_best <- readRDS("./outputs/maxent/ANHE_best.rds")
-#LISY_model_best <- readRDS("./outputs/maxent/LISY_best.rds")
-#PSMA_model_best <- readRDS("./outputs/maxent/PSMA_best.rds")
-#RALU_model_best <- readRDS("./outputs/maxent/RALU_best.rds")
+ABMA_model_best <- readRDS("./outputs/maxent/ABMA_best.rds")
+ANBO_model_best <- readRDS("./outputs/maxent/ANBO_best.rds")
+ANHE_model_best <- readRDS("./outputs/maxent/ANHE_best.rds")
+LISY_model_best <- readRDS("./outputs/maxent/LISY_best.rds")
+PSMA_model_best <- readRDS("./outputs/maxent/PSMA_best.rds")
+RALU_model_best <- readRDS("./outputs/maxent/RALU_best.rds")
 
 for (i in sp_ls) {
   #predict based on the model for present day
@@ -64,57 +66,57 @@ RALU_present_SDM <- raster('./outputs/maxent/rasters/ssp245/RALU_hs1.tif')
 
 for (i in sp_ls) {
 #ssp245
-output_predict2 <- predict(`ssp245_2021-2040`, get(paste(i,'model_best', sep = '')), progress='text')
+output_predict2 <- predict(`ssp245_2021-2040`, get(paste(i,'_model_best', sep = '')), progress='text')
 output_predict2 <- output_predict2 * 1000
 terra::writeRaster(output_predict2, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_hs2.tif', sep =''), filetype = 'GTiff')
 
-output_predict3 <- predict(`ssp245_2041-2060`, get(paste(i,'model_best', sep = '')), progress='text')
+output_predict3 <- predict(`ssp245_2041-2060`, get(paste(i,'_model_best', sep = '')), progress='text')
 output_predict3 <- output_predict3  * 1000
 terra::writeRaster(output_predict3, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_hs3.tif', sep =''), filetype = 'GTiff')
 
-output_predict4 <- predict(`ssp245_2061-2080`, get(paste(i,'model_best', sep = '')), progress='text')
+output_predict4 <- predict(`ssp245_2061-2080`, get(paste(i,'_model_best', sep = '')), progress='text')
 output_predict4 <- output_predict4 * 1000
 terra::writeRaster(output_predict4, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_hs4.tif', sep =''), filetype = 'GTiff')
 
-output_predict5 <- predict(`ssp245_2081-2100`, get(paste(i,'model_best', sep = '')), progress='text')
-output_predict5 <- predict * 1000
+output_predict5 <- predict(`ssp245_2081-2100`, get(paste(i,'_model_best', sep = '')), progress='text')
+output_predict5 <- output_predict5 * 1000
 terra::writeRaster(output_predict5, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_hs5.tif', sep =''), filetype = 'GTiff')
 }
 
 for (i in sp_ls) {
 #ssp370
-output_predict2 <- predict(`ssp370_2021-2040`, get(paste(i,'model_best', sep = '')), progress='text')
+output_predict2 <- predict(`ssp370_2021-2040`, get(paste(i,'_model_best', sep = '')), progress='text')
 output_predict2 <- output_predict2 * 1000
 terra::writeRaster(output_predict2, filename=paste('./outputs/maxent/rasters/ssp370/',i,'_hs2.tif', sep =''), filetype = 'GTiff')
 
-output_predict3 <- predict(`ssp370_2041-2060`, get(paste(i,'model_best', sep = '')), progress='text')
+output_predict3 <- predict(`ssp370_2041-2060`, get(paste(i,'_model_best', sep = '')), progress='text')
 output_predict3 <- output_predict3  * 1000
 terra::writeRaster(output_predict3, filename=paste('./outputs/maxent/rasters/ssp370/',i,'_hs3.tif', sep =''), filetype = 'GTiff')
 
-output_predict4 <- predict(`ssp370_2061-2080`, get(paste(i,'model_best', sep = '')), progress='text')
+output_predict4 <- predict(`ssp370_2061-2080`, get(paste(i,'_model_best', sep = '')), progress='text')
 output_predict4 <- output_predict4 * 1000
 terra::writeRaster(output_predict4, filename=paste('./outputs/maxent/rasters/ssp370/',i,'_hs4.tif', sep =''), filetype = 'GTiff')
 
-output_predict5 <- predict(`ssp370_2081-2100`, get(paste(i,'model_best', sep = '')), progress='text')
+output_predict5 <- predict(`ssp370_2081-2100`, get(paste(i,'_model_best', sep = '')), progress='text')
 output_predict5 <- predict * 1000
 terra::writeRaster(output_predict5, filename=paste('./outputs/maxent/rasters/ssp370/',i,'_hs5.tif', sep =''), filetype = 'GTiff')
 }
 
 for (i in sp_ls) {
 #ssp585
-output_predict2 <- predict(`ssp585_2021-2040`, get(paste(i,'model_best', sep = '')), progress='text')
+output_predict2 <- predict(`ssp585_2021-2040`, get(paste(i,'_model_best', sep = '')), progress='text')
 output_predict2 <- output_predict2 * 1000
 terra::writeRaster(output_predict2, filename=paste('./outputs/maxent/rasters/ssp585/',i,'_hs2.tif', sep =''), filetype = 'GTiff')
 
-output_predict3 <- predict(`ssp585_2041-2060`, get(paste(i,'model_best', sep = '')), progress='text')
+output_predict3 <- predict(`ssp585_2041-2060`, get(paste(i,'_model_best', sep = '')), progress='text')
 output_predict3 <- output_predict3  * 1000
 terra::writeRaster(output_predict3, filename=paste('./outputs/maxent/rasters/ssp585/',i,'_hs3.tif', sep =''), filetype = 'GTiff')
 
-output_predict4 <- predict(`ssp585_2061-2080`, get(paste(i,'model_best', sep = '')), progress='text')
+output_predict4 <- predict(`ssp585_2061-2080`, get(paste(i,'_model_best', sep = '')), progress='text')
 output_predict4 <- output_predict4 * 1000
 terra::writeRaster(output_predict4, filename=paste('./outputs/maxent/rasters/ssp585/',i,'_hs4.tif', sep =''), filetype = 'GTiff')
 
-output_predict5 <- predict(`ssp585_2081-2100`, get(paste(i,'model_best', sep = '')), progress='text')
+output_predict5 <- predict(`ssp585_2081-2100`, get(paste(i,'_model_best', sep = '')), progress='text')
 output_predict5 <- predict * 1000
 terra::writeRaster(output_predict5, filename=paste('./outputs/maxent/rasters/ssp585/',i,'_hs5.tif', sep =''), filetype = 'GTiff')
 
