@@ -9,23 +9,16 @@ library(tidyverse)
 library(MigClim)
 library(raster)
 
-
-
-#library(doParallel)
+library(doParallel)
 
 #for parallel processing
-#mc <- makeCluster(detectCores())
-#registerDoParallel(mc)
-
-#MigClim no longer on CRAN, so you have to manually download the zip and install from the zip file
-#note that the versions don't carry all scripts
-#general workflow is use R 4.0 for everything but the dispersal models
-
-
-#MIGCLIM. Note need to manually run creating the function from the 1.6 zip file. The 1.6.2 only has updates/changes.
+mc <- makeCluster(detectCores())
+registerDoParallel(mc)
 
 
 #need to the quantile thresholds. this does not need to be run if this script is run in the same sessions as the maxent output prep script
+
+sp_ls <- c("ABMA", "ANBO", "ANHE", "LISY", "PSMA", "RALU")
 
 #set up points and extract
 points_all_sp <- read.csv('./outputs/data_proc/cleaned_points.csv')
@@ -79,20 +72,34 @@ RALU_quant <- quantile(RALU_ENM_values, probs = 0.10, na.rm = TRUE)
 
 
 #migclim needs to be in the location of all of the files, so copy ini files to location with hs files
-
-i = 'ABMA'
+for (i in sp_ls){
+  ini <- raster(paste('./outputs/maxent/rasters/ssp245/',i,'_ini.tif'))
+  ex <- raster(paste('./outputs/maxent/rasters/ssp245/',i,'hs1.tif'))
+  ini_extended <- extend(ini, ex)
+  writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_ini_final.tif', sep=''), filetype = 'GTiff')
+  writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp370/',i,'_ini_final.tif', sep=''), filetype = 'GTiff') 
+  writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp585/',i,'_ini_final.tif', sep=''), filetype = 'GTiff') 
+  
+  ini_south <- raster(paste('./outputs/maxent/rasters/ssp245/',i,'_ini_south.tif'))
+  ini_extended <- extend(ini, ex)
+  writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_ini_south_final.tif', sep=''), filetype = 'GTiff')
+  writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp370/',i,'_ini_south_final.tif', sep=''), filetype = 'GTiff') 
+  writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp585/',i,'_ini_south_final.tif', sep=''), filetype = 'GTiff') 
+}
 
 ABMA_ini <- raster('./outputs/maxent/rasters/ssp245/ABMA_ini.tif')
 ABMA_hs_ex <- raster('./outputs/maxent/rasters/ssp245/ABMA_hs1.tif')
 ABMA_ini_extended <- extend(ABMA_ini, ABMA_hs_ex)
 writeRaster(ABMA_ini_extended, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_ini_final.tif', sep=''), filetype = 'GTiff')
 
+#move to location with the hs and ini files
 setwd("./outputs/maxent/rasters/ssp245")
 
+#run a test for each species that is short, to create the asc files MigClim will actually use
 
 MigClim.migrate(iniDist = "ABMA_ini_final",
                 hsMap="ABMA_hs",
-                rcThreshold = round(as.numeric(ABMA_quant)),
+                rcThreshold = 203,
                 envChgSteps=5,
                 dispSteps=1,
                 dispKernel=c(.1),
@@ -103,15 +110,4 @@ MigClim.migrate(iniDist = "ABMA_ini_final",
                 testMode=FALSE, 
                 fullOutput=FALSE, keepTempFiles=TRUE)
 
-MigClim.migrate (iniDist = "ABMA_ini",
-                 hsMap="hs_map",
-                 rcThreshold = 250,
-                 envChgSteps=1,
-                 dispSteps=5,
-                 dispKernel=c(.1),
-                 iniMatAge=1, propaguleProd=c(1),
-                 lddFreq=0.05, lddMinDist=3, lddMaxDist=4,
-                 simulName="ABMA_test2", replicateNb=1,
-                 overWrite=TRUE,
-                 testMode=FALSE, 
-                 fullOutput=FALSE, keepTempFiles=TRUE)
+#final MigClim models below
