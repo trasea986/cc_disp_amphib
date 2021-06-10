@@ -1,39 +1,104 @@
 library(tidyverse)
-library(MigClim)
-  #MigClim.userGuide() will open up the manual
-  #MigClim no longer on CRAN, so you have to manually download the zip and install from the zip file
-  #e.g. install.packages("package_name.tar.gz")
- 
 library(dismo)
-library(maptools)
-library(ggthemes)
+
+#SDMTools required for MigClim, but no longer on CRAN
+#remotes::install_version("SDMTools", "1.1-221")
+library(SDMTools)
+
+#MigClim no longer on CRAN, so you have to manually download the zip and install from the zip file
+#note that the versions don't carry all scripts
+#general workflow is use R 4.0 for everything but the dispersal models
+install.packages("D:/OneDrive/PhD/CSF_ABM_Project/cc_disp_amphib/bin/MigClim_1.6.tar.gz", repos = NULL, type = "source")
+#install.packages("D:/OneDrive/PhD/CSF_ABM_Project/cc_disp_amphib/bin/MigClim_1.6.1.tar.gz", repos = NULL, type = "source")
+#install.packages("D:/OneDrive/PhD/CSF_ABM_Project/cc_disp_amphib/bin/MigClim_1.6.2.tar.gz", repos = NULL, type = "source")
+
+library(MigClim)
 
 
-predict_ini <- reclassify(predict, c(0, 0.25, 0,
-                                      0.25, 1, 1)) 
-#rescale for hs map
-predict_migclim <- predict * 1000
+#need to the quantile thresholds. this does not need to be run if this script is run in the same sessions as the maxent output prep script
 
-#convert to lat/long to make compliant with strict ascii format. using original bioclim for crs
-predict_ini <- projectRaster(predict_ini, predictors$wc2.1_2.5m_bio_1)
-predict_migclim <- projectRaster(predict_migclim, predictors$wc2.1_2.5m_bio_1)
+#set up points and extract
+points_all_sp <- read.csv('./outputs/data_proc/cleaned_points.csv')
+ABMA_points <- points_all_sp %>% dplyr::filter(species == 'Ambystoma macrodactylum')
+ANBO_points <- points_all_sp %>% dplyr::filter(species == 'Anaxyrus boreas')
+ANHE_points <- points_all_sp %>% dplyr::filter(species == 'Anaxyrus hemiophrys')
+LISY_points <- points_all_sp %>% dplyr::filter(species == 'Lithobates sylvaticus')
+PSMA_points <- points_all_sp %>% dplyr::filter(species == 'Pseudacris maculata')
+RALU_points <- points_all_sp %>% dplyr::filter(species == 'Rana luteiventris')
 
-#export the two files
-writeRaster(predict_ini, filename='ABMA_ini', format="GTiff", overwrite = TRUE)
-writeRaster(predict_migclim, filename='hs_map1', format = "GTiff", overwrite = TRUE)
+#next up is to remove any points with NA predictor variable values.
+coordinates(ABMA_points) <- ~decimalLongitude+decimalLatitude
+coordinates(ANBO_points) <- ~decimalLongitude+decimalLatitude
+coordinates(ANHE_points) <- ~decimalLongitude+decimalLatitude
+coordinates(LISY_points) <- ~decimalLongitude+decimalLatitude
+coordinates(PSMA_points) <- ~decimalLongitude+decimalLatitude
+coordinates(RALU_points) <- ~decimalLongitude+decimalLatitude
 
-#MIGCLIM. Note need to manually run creating the function from the 1.6 zip file. The 1.6.2 only has updates/changes.
-MigClim.migrate (iniDist = "ABMA_ini",
-                 hsMap="hs_map",
-                 rcThreshold = 250,
-                 envChgSteps=1,
-                 dispSteps=5,
+#load in present day, background extent limited
+ABMA_ini_SDM <- raster('./outputs/maxent/rasters/ABMA_ini_cont.tif')
+ANBO_ini_SDM <- raster('./outputs/maxent/rasters/ANBO_ini_cont.tif')
+ANHE_ini_SDM <- raster('./outputs/maxent/rasters/ANHE_ini_cont.tif')
+LISY_ini_SDM <- raster('./outputs/maxent/rasters/LISY_ini_cont.tif')
+PSMA_ini_SDM <- raster('./outputs/maxent/rasters/PSMA_ini_cont.tif')
+RALU_ini_SDM <- raster('./outputs/maxent/rasters/RALU_ini_cont.tif')
+
+ABMA_ENM_values <- raster::extract(ABMA_ini_SDM, ABMA_points)
+ANBO_ENM_values <- raster::extract(ANBO_ini_SDM, ANBO_points)
+ANHE_ENM_values <- raster::extract(ANHE_ini_SDM, ANHE_points)
+LISY_ENM_values <- raster::extract(LISY_ini_SDM, LISY_points)
+PSMA_ENM_values <- raster::extract(PSMA_ini_SDM, PSMA_points)
+RALU_ENM_values <- raster::extract(RALU_ini_SDM, RALU_points)
+
+ABMA_ENM_values <- as.data.frame(ABMA_ENM_values)
+ANBO_ENM_values <- as.data.frame(ANBO_ENM_values)
+ANHE_ENM_values <- as.data.frame(ANHE_ENM_values)
+LISY_ENM_values <- as.data.frame(LISY_ENM_values)
+PSMA_ENM_values <- as.data.frame(PSMA_ENM_values)
+RALU_ENM_values <- as.data.frame(RALU_ENM_values)
+
+#calculate mean at occupancy value and subtract one standard deviation to determine the thresholds for the initial distribution
+
+ABMA_quant <- quantile(ABMA_ENM_values, probs = 0.10, na.rm = TRUE)
+ANBO_quant <- quantile(ANBO_ENM_values, probs = 0.10, na.rm = TRUE)
+ANHE_quant <- quantile(ANHE_ENM_values, probs = 0.10, na.rm = TRUE)
+LISY_quant <- quantile(LISY_ENM_values, probs = 0.10, na.rm = TRUE)
+PSMA_quant <- quantile(PSMA_ENM_values, probs = 0.10, na.rm = TRUE)
+RALU_quant <- quantile(RALU_ENM_values, probs = 0.10, na.rm = TRUE)
+
+#next prep step is to bring in and overwrite the initial distribution files to make them have a matching extent compared to the habitat suitability files
+
+
+#migclim needs to be in the location of all of the files, so copy ini files to location with hs files
+
+i = 'ABMA'
+
+ABMA_ini <- raster('./outputs/maxent/rasters/ssp245/ABMA_ini.tif')
+ABMA_hs_ex <- raster('./outputs/maxent/rasters/ssp245/ABMA_hs1.tif')
+ABMA_ini_extended <- extend(ABMA_ini, ABMA_hs_ex)
+writeRaster(ABMA_ini_extended, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_ini_final.tif', sep=''), filetype = 'GTiff')
+
+setwd("D:/OneDrive/PhD/CSF_ABM_Project/cc_disp_amphib/outputs/maxent/rasters/ssp245")
+
+hs1 <- raster('ABMA_hs1.asc')
+hs2<- raster('ABMA_hs2.asc')
+hs3<- raster('ABMA_hs3.asc')
+hs4<- raster('ABMA_hs4.tif')
+hs5<- raster('ABMA_hs5.tif')
+ini<- raster('ABMA_ini.tif')
+ini<- raster('./outputs/maxent/rasters/ssp245/ABMA_ini_final.tif')
+
+#ran, from bin, the script to create this function manually after running into some issues with the install above
+MigClim.migrate(iniDist = "ABMA_ini_final",
+                 hsMap="ABMA_hs",
+                 rcThreshold = round(as.numeric(ABMA_quant)),
+                 envChgSteps=5,
+                 dispSteps=1,
                  dispKernel=c(.1),
                  iniMatAge=1, propaguleProd=c(1),
                  lddFreq=0.05, lddMinDist=3, lddMaxDist=4,
                  simulName="ABMA_test", replicateNb=1,
                  overWrite=TRUE,
-                 testMode=FALSE, 
+                 testMode=TRUE, 
                  fullOutput=FALSE, keepTempFiles=TRUE)
 
 #read in the MigClim raster that was created

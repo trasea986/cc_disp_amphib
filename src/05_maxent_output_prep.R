@@ -2,6 +2,7 @@ library(dismo)
 
 sp_ls <- c("ABMA", "ANBO", "ANHE", "LISY", "PSMA", "RALU")
 
+
 #move the Maxent models out of the list and into the environment. name here is then pulled into prediction loops. this section is only needed if 04_maxent.R was done with the loop (only appropriate if ENMeval results show same model parameters lowest AIC)
 #model_ls <- c("ABMA_model", "ANBO_model", "ANHE_model", "LISY_model", "PSMA_model", "RALU_model")
 #names(MaxEnt_list) <- model_ls
@@ -98,7 +99,7 @@ output_predict4 <- output_predict4 * 1000
 terra::writeRaster(output_predict4, filename=paste('./outputs/maxent/rasters/ssp370/',i,'_hs4.tif', sep =''), filetype = 'GTiff')
 
 output_predict5 <- predict(`ssp370_2081-2100`, get(paste(i,'_model_best', sep = '')), progress='text')
-output_predict5 <- predict * 1000
+output_predict5 <- output_predict5 * 1000
 terra::writeRaster(output_predict5, filename=paste('./outputs/maxent/rasters/ssp370/',i,'_hs5.tif', sep =''), filetype = 'GTiff')
 }
 
@@ -117,7 +118,7 @@ output_predict4 <- output_predict4 * 1000
 terra::writeRaster(output_predict4, filename=paste('./outputs/maxent/rasters/ssp585/',i,'_hs4.tif', sep =''), filetype = 'GTiff')
 
 output_predict5 <- predict(`ssp585_2081-2100`, get(paste(i,'_model_best', sep = '')), progress='text')
-output_predict5 <- predict * 1000
+output_predict5 <- output_predict5 * 1000
 terra::writeRaster(output_predict5, filename=paste('./outputs/maxent/rasters/ssp585/',i,'_hs5.tif', sep =''), filetype = 'GTiff')
 
 }

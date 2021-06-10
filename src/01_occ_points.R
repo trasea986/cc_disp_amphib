@@ -31,7 +31,7 @@ colnames(keys) = c("key")
 #remove duplicated ABMA key
 keys <- unique(keys$key)
 
-#prepare download list from gbif
+#prepare download list from gbif. note that user, pwd, and email credentials and need to be created
 occ_prep <- occ_download(
   pred_in("taxonKey", keys),
   format = "SIMPLE_CSV",
