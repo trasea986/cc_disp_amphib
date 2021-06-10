@@ -70,7 +70,7 @@ LISY_quant <- quantile(LISY_ENM_values, probs = 0.10, na.rm = TRUE)
 PSMA_quant <- quantile(PSMA_ENM_values, probs = 0.10, na.rm = TRUE)
 RALU_quant <- quantile(RALU_ENM_values, probs = 0.10, na.rm = TRUE)
 
-#next prep step is to bring in and overwrite the initial distribution files to make them have a matching extent compared to the habitat suitability files
+#next prep step is to bring in and overwrite the initial discrete distribution files to make them have a matching extent compared to the habitat suitability files
 
 for (i in sp_ls){
   ini <- raster(paste('./outputs/maxent/rasters/ssp245/',i,'_ini.tif', sep = ''))
