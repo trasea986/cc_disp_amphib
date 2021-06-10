@@ -72,9 +72,10 @@ RALU_quant <- quantile(RALU_ENM_values, probs = 0.10, na.rm = TRUE)
 
 
 #migclim needs to be in the location of all of the files, so copy ini files to location with hs files
+
 for (i in sp_ls){
-  ini <- raster(paste('./outputs/maxent/rasters/ssp245/',i,'_ini.tif'))
-  ex <- raster(paste('./outputs/maxent/rasters/ssp245/',i,'hs1.tif'))
+  ini <- raster(paste('./outputs/maxent/rasters/ssp245/',i,'_ini.tif', sep = ''))
+  ex <- raster(paste('./outputs/maxent/rasters/ssp245/',i,'hs1.tif', sep = ''))
   ini_extended <- extend(ini, ex)
   writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_ini_final.tif', sep=''), filetype = 'GTiff')
   writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp370/',i,'_ini_final.tif', sep=''), filetype = 'GTiff') 
