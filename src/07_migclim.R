@@ -17,6 +17,7 @@ library(raster)
 #one parallel option is mcapply
 library(future.apply)
 multicore(workers = 12)
+plan(multicore) #for Windows machines use (multiprocess)
 
 #need to the quantile thresholds. this does not need to be run if this script is run in the same sessions as the maxent output prep script
 
@@ -95,6 +96,9 @@ setwd("./outputs/maxent/rasters/ssp245")
 #run a test for each species that is short, to create the asc files MigClim will actually use
 
 future_lapply(sp_ls, function(i) {
+  
+  print(paste(i, 'start', Sys.time()))
+  
   MigClim.migrate(iniDist = paste(i,"_ini_final", sep = ''),
                   hsMap=paste(i,'_hs', sep = ''),
                   rcThreshold = round(as.numeric(get(paste(i,'_quant', sep = '')))),
@@ -112,5 +116,25 @@ future_lapply(sp_ls, function(i) {
                   testMode=FALSE, 
                   fullOutput=FALSE, 
                   keepTempFiles=TRUE)
+  
+  MigClim.migrate(iniDist = paste(i,"_ini_south_final", sep = ''),
+                  hsMap=paste(i,'_hs', sep = ''),
+                  rcThreshold = round(as.numeric(get(paste(i,'_quant', sep = '')))),
+                  envChgSteps=5,
+                  dispSteps=1,
+                  dispKernel=c(.1),
+                  iniMatAge=1, 
+                  propaguleProd=c(1),
+                  lddFreq=0.05, 
+                  lddMinDist=3, 
+                  lddMaxDist=4,
+                  simulName=paste(i,'_south_test', sep = ''), 
+                  replicateNb=1,
+                  overWrite=TRUE,
+                  testMode=FALSE, 
+                  fullOutput=FALSE, 
+                  keepTempFiles=TRUE)
+  
+  print(paste(i, 'end', Sys.time()))
 })
 
