@@ -9,15 +9,18 @@ library(tidyverse)
 library(MigClim)
 library(raster)
 
+#these take a long time, so best to run in parallel
+#option one (and Erich's preferred method)
 #library(doParallel)
 #for parallel processing
 #mc <- makeCluster(detectCores())
 #registerDoParallel(mc)
 
-#one parallel option is mcapply
+#option 2, and what I have used in the past
 library(future.apply)
 multicore(workers = 12)
 plan(multicore) #for Windows machines use (multiprocess)
+future.seed = TRUE
 
 #need to the quantile thresholds. this does not need to be run if this script is run in the same sessions as the maxent output prep script
 
@@ -95,9 +98,11 @@ setwd("./outputs/maxent/rasters/ssp245")
 
 #run a test for each species that is short, to create the asc files MigClim will actually use
 
+###AFTER RUNNING TEST: Make sure to move the .tif files to a new directory or else MigClim.migrate will convert every time, which is very slow
+
 future_lapply(sp_ls, function(i) {
   
-  print(paste(i, 'start', Sys.time()))
+  start <- (paste(i, 'start', Sys.time()))
   
   MigClim.migrate(iniDist = paste(i,"_ini_final", sep = ''),
                   hsMap=paste(i,'_hs', sep = ''),
@@ -135,6 +140,10 @@ future_lapply(sp_ls, function(i) {
                   fullOutput=FALSE, 
                   keepTempFiles=TRUE)
   
-  print(paste(i, 'end', Sys.time()))
+  end <- paste(i, 'end', Sys.time())
+  
+  time <- rbind(start, end)
+  
+  write.table(time, "time.csv", sep = ",", col.names = FALSE, append = TRUE)
 })
 
