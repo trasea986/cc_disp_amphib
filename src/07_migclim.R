@@ -122,6 +122,8 @@ future_lapply(sp_ls, function(i) {
                   fullOutput=FALSE, 
                   keepTempFiles=TRUE)
   
+  unlink(paste('./',i,'_test/',i,'_test_raster.asc', sep =''))
+  
   MigClim.migrate(iniDist = paste(i,"_ini_south_final", sep = ''),
                   hsMap=paste(i,'_hs', sep = ''),
                   rcThreshold = round(as.numeric(get(paste(i,'_quant', sep = '')))),
@@ -139,6 +141,8 @@ future_lapply(sp_ls, function(i) {
                   testMode=FALSE, 
                   fullOutput=FALSE, 
                   keepTempFiles=TRUE)
+  
+  unlink(paste('./',i,'_south_test/',i,'_south_test_raster.asc', sep =''))
   
   end <- paste(i, 'end', Sys.time())
   
