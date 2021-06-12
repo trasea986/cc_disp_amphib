@@ -20,7 +20,7 @@ library(raster)
 library(future.apply)
 multicore(workers = 12)
 plan(multicore) #for Windows machines use (multiprocess)
-future.seed = TRUE
+
 
 #need to the quantile thresholds. this does not need to be run if this script is run in the same sessions as the maxent output prep script
 
@@ -95,6 +95,7 @@ for (i in sp_ls){
 #migclim needs to be in the location of all of the files, so copy ini files to location with hs files
 #move to location with the hs and ini files
 setwd("./outputs/maxent/rasters/ssp245")
+setwd("./outputs/maxent/rasters/ssp370")
 
 #run a test for each species that is short, to create the asc files MigClim will actually use
 
@@ -149,5 +150,5 @@ future_lapply(sp_ls, function(i) {
   time <- rbind(start, end)
   
   write.table(time, "time.csv", sep = ",", col.names = FALSE, append = TRUE)
-})
+}, future.seed = TRUE)
 
