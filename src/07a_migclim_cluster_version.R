@@ -127,11 +127,11 @@ future_lapply(sp_ls, function(i) {
                    #lddFreq=0.05, lddMinDist=3, lddMaxDist=4,
                    simulName=paste("full_",i,'_age2', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
-  unlink(paste('./full_',i,'_age2/',i,'_age21_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_age2/',i,'_age22_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_age2/',i,'_age23_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_age2/',i,'_age24_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_age2/',i,'_age25_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_age2/full_',i,'_age21_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_age2/full_',i,'_age22_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_age2/full_',i,'_age23_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_age2/full_',i,'_age24_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_age2/full_',i,'_age25_raster.asc', sep =''))
   
   MigClim.migrate (iniDist = paste(i,"_ini_final", sep = ''),
                    hsMap=paste(i,'_hs', sep = ''),
@@ -143,11 +143,11 @@ future_lapply(sp_ls, function(i) {
                    #lddFreq=0.05, lddMinDist=3, lddMaxDist=4,
                    simulName=paste("full_",i,'_age3', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
-  unlink(paste('./full_',i,'_age3/',i,'_age31_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_age3/',i,'_age32_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_age3/',i,'_age33_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_age3/',i,'_age34_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_age3/',i,'_age35_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_age3/full_',i,'_age31_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_age3/full_',i,'_age32_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_age3/full_',i,'_age33_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_age3/full_',i,'_age34_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_age3/full_',i,'_age35_raster.asc', sep =''))
   
   MigClim.migrate (iniDist = paste(i,"_ini_final", sep = ''),
                    hsMap=paste(i,'_hs', sep = ''),
@@ -159,11 +159,11 @@ future_lapply(sp_ls, function(i) {
                    #lddFreq=0.05, lddMinDist=3, lddMaxDist=4,
                    simulName=paste("full_",i,'_age4', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
-  unlink(paste('./full_',i,'_age4/',i,'_age41_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_age4/',i,'_age42_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_age4/',i,'_age43_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_age4/',i,'_age44_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_age4/',i,'_age45_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_age4/full_',i,'_age41_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_age4/full_',i,'_age42_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_age4/full_',i,'_age43_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_age4/full_',i,'_age44_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_age4/full_',i,'_age45_raster.asc', sep =''))
   
   MigClim.migrate (iniDist = paste(i,"_ini_final", sep = ''),
                    hsMap=paste(i,'_hs', sep = ''),
@@ -175,11 +175,11 @@ future_lapply(sp_ls, function(i) {
                    #lddFreq=0.05, lddMinDist=3, lddMaxDist=9,
                    simulName=paste("full_",i,'_age5', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
-  unlink(paste('./full_',i,'_age5/',i,'_age51_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_age5/',i,'_age52_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_age5/',i,'_age53_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_age5/',i,'_age54_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_age5/',i,'_age55_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_age5/full_',i,'_age51_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_age5/full_',i,'_age52_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_age5/full_',i,'_age53_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_age5/full_',i,'_age54_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_age5/full_',i,'_age55_raster.asc', sep =''))
   
   MigClim.migrate (iniDist = paste(i,"_ini_final", sep = ''),
                    hsMap=paste(i,'_hs', sep = ''),
@@ -191,11 +191,11 @@ future_lapply(sp_ls, function(i) {
                    #lddFreq=0.05, lddMinDist=3, lddMaxDist=4,
                    simulName=paste("full_",i,'_age6', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
-  unlink(paste('./full_',i,'_age6/',i,'_age61_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_age6/',i,'_age62_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_age6/',i,'_age63_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_age6/',i,'_age64_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_age6/',i,'_age65_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_age6/full_',i,'_age61_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_age6/full_',i,'_age62_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_age6/full_',i,'_age63_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_age6/full_',i,'_age64_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_age6/full_',i,'_age65_raster.asc', sep =''))
   
   print('Age done')
   
@@ -211,11 +211,11 @@ future_lapply(sp_ls, function(i) {
                    #lddFreq=0.05, lddMinDist=3, lddMaxDist=4,
                    simulName=paste("full_",i,'_rate2', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
-  unlink(paste('./full_',i,'_rate2/',i,'_rate21_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_rate2/',i,'_rate22_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_rate2/',i,'_rate23_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_rate2/',i,'_rate24_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_rate2/',i,'_rate25_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_rate2/full_',i,'_rate21_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_rate2/full_',i,'_rate22_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_rate2/full_',i,'_rate23_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_rate2/full_',i,'_rate24_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_rate2/full_',i,'_rate25_raster.asc', sep =''))
   
   MigClim.migrate (iniDist = paste(i,"_ini_final", sep = ''),
                    hsMap=paste(i,'_hs', sep = ''),
@@ -227,11 +227,11 @@ future_lapply(sp_ls, function(i) {
                    #lddFreq=0.05, lddMinDist=3, lddMaxDist=4,
                    simulName=paste("full_",i,'_rate4', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
-  unlink(paste('./full_',i,'_rate4/',i,'_rate41_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_rate4/',i,'_rate42_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_rate4/',i,'_rate43_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_rate4/',i,'_rate44_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_rate4/',i,'_rate45_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_rate4/full_',i,'_rate41_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_rate4/full_',i,'_rate42_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_rate4/full_',i,'_rate43_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_rate4/full_',i,'_rate44_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_rate4/full_',i,'_rate45_raster.asc', sep =''))
   
   MigClim.migrate (iniDist = paste(i,"_ini_final", sep = ''),
                    hsMap=paste(i,'_hs', sep = ''),
@@ -243,11 +243,11 @@ future_lapply(sp_ls, function(i) {
                    #lddFreq=0.05, lddMinDist=3, lddMaxDist=4,
                    simulName=paste("full_",i,'_rate6', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
-  unlink(paste('./full_',i,'_rate6/',i,'_rate61_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_rate6/',i,'_rate62_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_rate6/',i,'_rate63_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_rate6/',i,'_rate64_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_rate6/',i,'_rate65_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_rate6/full_',i,'_rate61_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_rate6/full_',i,'_rate62_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_rate6/full_',i,'_rate63_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_rate6/full_',i,'_rate64_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_rate6/full_',i,'_rate65_raster.asc', sep =''))
   
   MigClim.migrate (iniDist = paste(i,"_ini_final", sep = ''),
                    hsMap=paste(i,'_hs', sep = ''),
@@ -259,11 +259,11 @@ future_lapply(sp_ls, function(i) {
                    #lddFreq=0.05, lddMinDist=3, lddMaxDist=4,
                    simulName=paste("full_",i,'_rate8', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
-  unlink(paste('./full_',i,'_rate8/',i,'_rate81_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_rate8/',i,'_rate82_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_rate8/',i,'_rate83_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_rate8/',i,'_rate84_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_rate8/',i,'_rate85_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_rate8/full_',i,'_rate81_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_rate8/full_',i,'_rate82_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_rate8/full_',i,'_rate83_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_rate8/full_',i,'_rate84_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_rate8/full_',i,'_rate85_raster.asc', sep =''))
   
   MigClim.migrate (iniDist = paste(i,"_ini_final", sep = ''),
                    hsMap=paste(i,'_hs', sep = ''),
@@ -275,11 +275,11 @@ future_lapply(sp_ls, function(i) {
                    #lddFreq=0.05, lddMinDist=3, lddMaxDist=4,
                    simulName=paste("full_",i,'_rate10', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
-  unlink(paste('./full_',i,'_rate10/',i,'_rate101_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_rate10/',i,'_rate102_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_rate10/',i,'_rate103_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_rate10/',i,'_rate104_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_rate10/',i,'_rate105_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_rate10/full_',i,'_rate101_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_rate10/full_',i,'_rate102_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_rate10/full_',i,'_rate103_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_rate10/full_',i,'_rate104_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_rate10/full_',i,'_rate105_raster.asc', sep =''))
   
   print('Rate done')
   
@@ -295,11 +295,11 @@ future_lapply(sp_ls, function(i) {
                    #lddFreq=0.05, lddMinDist=3, lddMaxDist=4,
                    simulName=paste("full_",i,'_distance10', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
-  unlink(paste('./full_',i,'_distance10/',i,'_distance101_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_distance10/',i,'_distance102_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_distance10/',i,'_distance103_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_distance10/',i,'_distance104_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_distance10/',i,'_distance105_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance10/full_',i,'_distance101_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance10/full_',i,'_distance102_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance10/full_',i,'_distance103_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance10/full_',i,'_distance104_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance10/full_',i,'_distance105_raster.asc', sep =''))
   
   MigClim.migrate (iniDist = paste(i,"_ini_final", sep = ''),
                    hsMap=paste(i,'_hs', sep = ''),
@@ -311,11 +311,11 @@ future_lapply(sp_ls, function(i) {
                    #lddFreq=0.05, lddMinDist=3, lddMaxDist=4,
                    simulName=paste("full_",i,'_distance15', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
-  unlink(paste('./full_',i,'_distance15/',i,'_distance151_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_distance15/',i,'_distance152_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_distance15/',i,'_distance153_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_distance15/',i,'_distance154_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_distance15/',i,'_distance155_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance15/full_',i,'_distance151_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance15/full_',i,'_distance152_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance15/full_',i,'_distance153_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance15/full_',i,'_distance154_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance15/full_',i,'_distance155_raster.asc', sep =''))
   
   MigClim.migrate (iniDist = paste(i,"_ini_final", sep = ''),
                    hsMap=paste(i,'_hs', sep = ''),
@@ -327,11 +327,11 @@ future_lapply(sp_ls, function(i) {
                    #lddFreq=0.05, lddMinDist=3, lddMaxDist=4,
                    simulName=paste("full_",i,'_distance30', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
-  unlink(paste('./full_',i,'_distance30/',i,'_distance301_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_distance30/',i,'_distance302_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_distance30/',i,'_distance303_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_distance30/',i,'_distance304_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_distance30/',i,'_distance305_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance30/full_',i,'_distance301_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance30/full_',i,'_distance302_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance30/full_',i,'_distance303_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance30/full_',i,'_distance304_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance30/full_',i,'_distance305_raster.asc', sep =''))
   
   MigClim.migrate (iniDist = paste(i,"_ini_final", sep = ''),
                    hsMap=paste(i,'_hs', sep = ''),
@@ -341,13 +341,13 @@ future_lapply(sp_ls, function(i) {
                    dispKernel=c(0.78, 0.61, 0.47, 0.37, 0.29, 0.22, 0.17, 0.14, 0.11),
                    iniMatAge=1, propaguleProd=c(1),
                    #lddFreq=0.05, lddMinDist=3, lddMaxDist=4,
-                   simulName=paste(i,'_distance45', sep = ''), replicateNb=5, overWrite=TRUE,
+                   simulName=paste("full_",i,'_distance45', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
-  unlink(paste('./full_',i,'_distance45/',i,'_distance451_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_distance45/',i,'_distance452_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_distance45/',i,'_distance453_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_distance45/',i,'_distance454_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_distance45/',i,'_distance455_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance45/full_',i,'_distance451_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance45/full_',i,'_distance452_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance45/full_',i,'_distance453_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance45/full_',i,'_distance454_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance45/full_',i,'_distance455_raster.asc', sep =''))
   
   MigClim.migrate (iniDist = paste(i,"_ini_final", sep = ''),
                    hsMap=paste(i,'_hs', sep = ''),
@@ -359,11 +359,11 @@ future_lapply(sp_ls, function(i) {
                    #lddFreq=0.05, lddMinDist=3, lddMaxDist=4,
                    simulName=paste("full_",i,'_distance60', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
-  unlink(paste('./full_',i,'_distance60/',i,'_distance601_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_distance60/',i,'_distance602_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_distance60/',i,'_distance603_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_distance60/',i,'_distance604_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_distance60/',i,'_distance605_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance60/full_',i,'_distance601_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance60/full_',i,'_distance602_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance60/full_',i,'_distance603_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance60/full_',i,'_distance604_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance60/full_',i,'_distance605_raster.asc', sep =''))
   
   MigClim.migrate (iniDist = paste(i,"_ini_final", sep = ''),
                    hsMap=paste(i,'_hs', sep = ''),
@@ -375,11 +375,11 @@ future_lapply(sp_ls, function(i) {
                    #lddFreq=0.05, lddMinDist=3, lddMaxDist=4,
                    simulName=paste("full_",i,'_distance110', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
-  unlink(paste('./full_',i,'_distance110/',i,'_distance1101_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_distance110/',i,'_distance1102_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_distance110/',i,'_distance1103_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_distance110/',i,'_distance1104_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_distance110/',i,'_distance1105_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance110/full_',i,'_distance1101_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance110/full_',i,'_distance1102_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance110/full_',i,'_distance1103_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance110/full_',i,'_distance1104_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_distance110/full_',i,'_distance1105_raster.asc', sep =''))
   
   print('Distance done')
   
@@ -395,11 +395,11 @@ future_lapply(sp_ls, function(i) {
                    lddFreq=0.05, lddMinDist=3, lddMaxDist=4,
                    simulName=paste("full_",i,'_lddrate05', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
-  unlink(paste('./full_',i,'_lddrate05/',i,'_lddrate051_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_lddrate05/',i,'_lddrate052_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_lddrate05/',i,'_lddrate053_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_lddrate05/',i,'_lddrate054_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_lddrate05/',i,'_lddrate055_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_lddrate05/full_',i,'_lddrate051_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_lddrate05/full_',i,'_lddrate052_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_lddrate05/full_',i,'_lddrate053_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_lddrate05/full_',i,'_lddrate054_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_lddrate05/full_',i,'_lddrate055_raster.asc', sep =''))
   
   MigClim.migrate (iniDist = paste(i,"_ini_final", sep = ''),
                    hsMap=paste(i,'_hs', sep = ''),
@@ -411,11 +411,11 @@ future_lapply(sp_ls, function(i) {
                    lddFreq=0.10, lddMinDist=3, lddMaxDist=4,
                    simulName=paste("full_",i,'_lddrate10', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
-  unlink(paste('./full_',i,'_lddrate10/',i,'_lddrate101_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_lddrate10/',i,'_lddrate102_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_lddrate10/',i,'_lddrate103_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_lddrate10/',i,'_lddrate104_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_lddrate10/',i,'_lddrate105_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_lddrate10/full_',i,'_lddrate101_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_lddrate10/full_',i,'_lddrate102_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_lddrate10/full_',i,'_lddrate103_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_lddrate10/full_',i,'_lddrate104_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_lddrate10/full_',i,'_lddrate105_raster.asc', sep =''))
   
   MigClim.migrate (iniDist = paste(i,"_ini_final", sep = ''),
                    hsMap=paste(i,'_hs', sep = ''),
@@ -427,11 +427,11 @@ future_lapply(sp_ls, function(i) {
                    lddFreq=0.15, lddMinDist=3, lddMaxDist=4,
                    simulName=paste("full_",i,'_lddrate15', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
-  unlink(paste('./full_',i,'_lddrate15/',i,'_lddrate151_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_lddrate15/',i,'_lddrate152_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_lddrate15/',i,'_lddrate153_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_lddrate15/',i,'_lddrate154_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_lddrate15/',i,'_lddrate155_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_lddrate15/full_',i,'_lddrate151_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_lddrate15/full_',i,'_lddrate152_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_lddrate15/full_',i,'_lddrate153_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_lddrate15/full_',i,'_lddrate154_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_lddrate15/full_',i,'_lddrate155_raster.asc', sep =''))
   
   MigClim.migrate (iniDist = paste(i,"_ini_final", sep = ''),
                    hsMap=paste(i,'_hs', sep = ''),
@@ -443,11 +443,11 @@ future_lapply(sp_ls, function(i) {
                    lddFreq=0.20, lddMinDist=3, lddMaxDist=4,
                    simulName=paste("full_",i,'_lddrate20', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
-  unlink(paste('./full_',i,'_lddrate20/',i,'_lddrate201_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_lddrate20/',i,'_lddrate202_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_lddrate20/',i,'_lddrate203_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_lddrate20/',i,'_lddrate204_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_lddrate20/',i,'_lddrate205_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_lddrate20/full_',i,'_lddrate201_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_lddrate20/full_',i,'_lddrate202_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_lddrate20/full_',i,'_lddrate203_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_lddrate20/full_',i,'_lddrate204_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_lddrate20/full_',i,'_lddrate205_raster.asc', sep =''))
   
   MigClim.migrate (iniDist = paste(i,"_ini_final", sep = ''),
                    hsMap=paste(i,'_hs', sep = ''),
@@ -459,11 +459,11 @@ future_lapply(sp_ls, function(i) {
                    lddFreq=0.25, lddMinDist=3, lddMaxDist=4,
                    simulName=paste("full_",i,'_lddrate25', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
-  unlink(paste('./full_',i,'_lddrate25/',i,'_lddrate251_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_lddrate25/',i,'_lddrate252_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_lddrate25/',i,'_lddrate253_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_lddrate25/',i,'_lddrate254_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_lddrate25/',i,'_lddrate255_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_lddrate25/full_',i,'_lddrate251_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_lddrate25/full_',i,'_lddrate252_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_lddrate25/full_',i,'_lddrate253_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_lddrate25/full_',i,'_lddrate254_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_lddrate25/full_',i,'_lddrate255_raster.asc', sep =''))
   
   print('LDD Rate Done')
   
@@ -479,11 +479,11 @@ future_lapply(sp_ls, function(i) {
                    lddFreq=0.05, lddMinDist=3, lddMaxDist=4,
                    simulName=paste("full_",i,'_ldddist5', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
-  unlink(paste('./full_',i,'_ldddist4/',i,'_ldddist41_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_ldddist4/',i,'_ldddist42_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_ldddist4/',i,'_ldddist43_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_ldddist4/',i,'_ldddist44_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_ldddist4/',i,'_ldddist45_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_ldddist4/full_',i,'_ldddist41_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_ldddist4/full_',i,'_ldddist42_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_ldddist4/full_',i,'_ldddist43_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_ldddist4/full_',i,'_ldddist44_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_ldddist4/full_',i,'_ldddist45_raster.asc', sep =''))
   
   MigClim.migrate (iniDist = paste(i,"_ini_final", sep = ''),
                    hsMap=paste(i,'_hs', sep = ''),
@@ -495,11 +495,11 @@ future_lapply(sp_ls, function(i) {
                    lddFreq=0.05, lddMinDist=4, lddMaxDist=5,
                    simulName=paste("full_",i,'_ldddist5', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
-  unlink(paste('./full_',i,'_ldddist5/',i,'_ldddist51_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_ldddist5/',i,'_ldddist52_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_ldddist5/',i,'_ldddist53_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_ldddist5/',i,'_ldddist54_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_ldddist5/',i,'_ldddist55_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_ldddist5/full_',i,'_ldddist51_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_ldddist5/full_',i,'_ldddist52_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_ldddist5/full_',i,'_ldddist53_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_ldddist5/full_',i,'_ldddist54_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_ldddist5/full_',i,'_ldddist55_raster.asc', sep =''))
   
   MigClim.migrate (iniDist = paste(i,"_ini_final", sep = ''),
                    hsMap=paste(i,'_hs', sep = ''),
@@ -511,11 +511,11 @@ future_lapply(sp_ls, function(i) {
                    lddFreq=0.05, lddMinDist=5, lddMaxDist=6,
                    simulName=paste("full_",i,'_ldddist6', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
-  unlink(paste('./full_',i,'_ldddist6/',i,'_ldddist61_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_ldddist6/',i,'_ldddist62_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_ldddist6/',i,'_ldddist63_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_ldddist6/',i,'_ldddist64_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_ldddist6/',i,'_ldddist65_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_ldddist6/full_',i,'_ldddist61_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_ldddist6/full_',i,'_ldddist62_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_ldddist6/full_',i,'_ldddist63_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_ldddist6/full_',i,'_ldddist64_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_ldddist6/full_',i,'_ldddist65_raster.asc', sep =''))
   
   MigClim.migrate (iniDist = paste(i,"_ini_final", sep = ''),
                    hsMap=paste(i,'_hs', sep = ''),
@@ -527,11 +527,11 @@ future_lapply(sp_ls, function(i) {
                    lddFreq=0.05, lddMinDist=6, lddMaxDist=7,
                    simulName=paste("full_",i,'_ldddist7', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
-  unlink(paste('./full_',i,'_ldddist7/',i,'_ldddist71_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_ldddist7/',i,'_ldddist72_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_ldddist7/',i,'_ldddist73_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_ldddist7/',i,'_ldddist74_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_ldddist7/',i,'_ldddist75_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_ldddist7/full_',i,'_ldddist71_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_ldddist7/full_',i,'_ldddist72_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_ldddist7/full_',i,'_ldddist73_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_ldddist7/full_',i,'_ldddist74_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_ldddist7/full_',i,'_ldddist75_raster.asc', sep =''))
   
   MigClim.migrate (iniDist = paste(i,"_ini_final", sep = ''),
                    hsMap=paste(i,'_hs', sep = ''),
@@ -543,11 +543,11 @@ future_lapply(sp_ls, function(i) {
                    lddFreq=0.05, lddMinDist=7, lddMaxDist=8,
                    simulName=paste("full_",i,'_ldddist8', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
-  unlink(paste('./full_',i,'_ldddist8/',i,'_ldddist81_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_ldddist8/',i,'_ldddist82_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_ldddist8/',i,'_ldddist83_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_ldddist8/',i,'_ldddist84_raster.asc', sep =''))
-  unlink(paste('./full_',i,'_ldddist8/',i,'_ldddist85_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_ldddist8/full_',i,'_ldddist81_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_ldddist8/full_',i,'_ldddist82_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_ldddist8/full_',i,'_ldddist83_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_ldddist8/full_',i,'_ldddist84_raster.asc', sep =''))
+  unlink(paste('./full_',i,'_ldddist8/full_',i,'_ldddist85_raster.asc', sep =''))
   
   print('LDD Distance Done')
   
