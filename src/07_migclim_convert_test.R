@@ -1,6 +1,6 @@
 library(tidyverse)
 #MigClim.userGuide() will open up the manual
-#MigClim no longer on CRAN, so you have to manually download the zip and install from the zip file
+#MigClim no longer on CRAN, so you have to manually download the zip and install from the zip file or remotes with the specific version
 
 #remotes::install_version("SDMTools", "1.1-221")
 #remotes::install_version("MigClim", "1.6.1")
@@ -19,12 +19,16 @@ library(raster)
 #option 2, and what I have used in the past
 library(future.apply)
 multicore(workers = 6)
-plan(multicore) #for Windows machines use (multiprocess)
-
+#plan(multicore) if lapply only using sp_list
+#for Windows machines use (multiprocess)
+plan(list(sequential, multicore)) #work through ssps/climate change sequentially, but
 
 #need to the quantile thresholds. this does not need to be run if this script is run in the same sessions as the maxent output prep script
 
 sp_ls <- c("ABMA", "ANBO", "ANHE", "LISY", "PSMA", "RALU")
+
+#and ssp list for lapply later
+cc_list <- c('ssp245', 'ssp370', 'ssp585')
 
 #set up points and extract
 points_all_sp <- read.csv('./outputs/data_proc/cleaned_points.csv')
@@ -74,33 +78,45 @@ LISY_quant <- quantile(LISY_ENM_values, probs = 0.10, na.rm = TRUE)
 PSMA_quant <- quantile(PSMA_ENM_values, probs = 0.10, na.rm = TRUE)
 RALU_quant <- quantile(RALU_ENM_values, probs = 0.10, na.rm = TRUE)
 
+print('quants calculated and saved')
+
 #next prep step is to bring in and overwrite the initial discrete distribution files to make them have a matching extent compared to the habitat suitability files
 
-for (i in sp_ls){
-  ini <- raster(paste('./outputs/maxent/rasters/ssp245/',i,'_ini.tif', sep = ''))
-  ex <- raster(paste('./outputs/maxent/rasters/ssp245/',i,'_hs1.tif', sep = ''))
- ini_extended <- extend(ini, ex)
- writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_ini_final.tif', sep=''), filetype = 'GTiff')
- writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp370/',i,'_ini_final.tif', sep=''), filetype = 'GTiff')
- writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp585/',i,'_ini_final.tif', sep=''), filetype = 'GTiff')
-  
-  ini_south <- raster(paste('./outputs/maxent/rasters/ssp245/',i,'_ini_south.tif', sep =''))
-  ini_extended <- extend(ini_south, ex)
-  writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_ini_south_final.tif', sep=''), filetype = 'GTiff')
-  writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp370/',i,'_ini_south_final.tif', sep=''), filetype = 'GTiff') 
-  writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp585/',i,'_ini_south_final.tif', sep=''), filetype = 'GTiff') 
-}
+#SKIP if already run once
 
+# for (i in sp_ls){
+#   ini <- raster(paste('./outputs/maxent/rasters/ssp245/',i,'_ini.tif', sep = ''))
+#   ex <- raster(paste('./outputs/maxent/rasters/ssp245/',i,'_hs1.tif', sep = ''))
+#  ini_extended <- extend(ini, ex)
+#  writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_ini_final.tif', sep=''), filetype = 'GTiff')
+#  writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp370/',i,'_ini_final.tif', sep=''), filetype = 'GTiff')
+#  writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp585/',i,'_ini_final.tif', sep=''), filetype = 'GTiff')
+#   
+#   ini_south <- raster(paste('./outputs/maxent/rasters/ssp245/',i,'_ini_south.tif', sep =''))
+#   ini_extended <- extend(ini_south, ex)
+#   writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_ini_south_final.tif', sep=''), filetype = 'GTiff')
+#   writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp370/',i,'_ini_south_final.tif', sep=''), filetype = 'GTiff') 
+#   writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp585/',i,'_ini_south_final.tif', sep=''), filetype = 'GTiff') 
+# }
 
-#move to location with the hs and ini files
-setwd("./outputs/maxent/rasters/ssp245")
 
 
 #run a test for each species that is short, to create the asc files MigClim will actually use
 
 ###AFTER RUNNING TEST: Make sure to move the .tif files to a new directory or else MigClim.migrate will convert every time, which is very slow
 
-future_lapply(sp_ls, function(i) {
+#start this in one of the spp raster directories because first step is to go up and then in one of the spp directories
+
+#move to location with the hs and ini files
+setwd("./outputs/maxent/rasters/ssp245")
+
+print('begin MigClim tests and conversions')
+
+future_lapply(cc_list, function(c) {
+  
+  setwd(paste('../', c, sep=''))
+  
+  future_lapply(sp_ls, function(i) {
   
   start <- (paste(i, 'start', Sys.time()))
   
@@ -149,112 +165,11 @@ future_lapply(sp_ls, function(i) {
   time <- rbind(start, end)
   
   write.table(time, "time.csv", sep = ",", col.names = FALSE, append = TRUE)
-}, future.seed = TRUE)
 
-#now do the same thing but for other SSPs. Some things like ini and hs1 are not going to change here, but better to double check alignment
+  }, future.seed = TRUE)
+})
 
-setwd("../ssp370")
-future_lapply(sp_ls, function(i) {
-  
-  start <- (paste(i, 'start', Sys.time()))
-  
-  MigClim.migrate(iniDist = paste(i,"_ini_final", sep = ''),
-                  hsMap=paste(i,'_hs', sep = ''),
-                  rcThreshold = round(as.numeric(get(paste(i,'_quant', sep = '')))),
-                  envChgSteps=5,
-                  dispSteps=1,
-                  dispKernel=c(.1),
-                  iniMatAge=1,
-                  propaguleProd=c(1),
-                  lddFreq=0.05,
-                  lddMinDist=3,
-                  lddMaxDist=4,
-                  simulName=paste(i,'_test', sep = ''),
-                  replicateNb=1,
-                  overWrite=TRUE,
-                  testMode=FALSE,
-                  fullOutput=FALSE,
-                  keepTempFiles=TRUE)
-
-  unlink(paste('./',i,'_test/',i,'_test_raster.asc', sep =''))
-  
-  MigClim.migrate(iniDist = paste(i,"_ini_south_final", sep = ''),
-                  hsMap=paste(i,'_hs', sep = ''),
-                  rcThreshold = round(as.numeric(get(paste(i,'_quant', sep = '')))),
-                  envChgSteps=5,
-                  dispSteps=1,
-                  dispKernel=c(.1),
-                  iniMatAge=1, 
-                  propaguleProd=c(1),
-                  lddFreq=0.05, 
-                  lddMinDist=3, 
-                  lddMaxDist=4,
-                  simulName=paste(i,'_south_test', sep = ''), 
-                  replicateNb=1,
-                  overWrite=TRUE,
-                  testMode=FALSE, 
-                  fullOutput=FALSE, 
-                  keepTempFiles=TRUE)
-  
-  unlink(paste('./',i,'_south_test/',i,'_south_test_raster.asc', sep =''))
-  
-  end <- paste(i, 'end', Sys.time())
-  
-  time <- rbind(start, end)
-  
-  write.table(time, "time.csv", sep = ",", col.names = FALSE, append = TRUE)
-}, future.seed = TRUE)
-
-setwd("../ssp585")
-future_lapply(sp_ls, function(i) {
-  
-  start <- (paste(i, 'start', Sys.time()))
-  
-  MigClim.migrate(iniDist = paste(i,"_ini_final", sep = ''),
-                  hsMap=paste(i,'_hs', sep = ''),
-                  rcThreshold = round(as.numeric(get(paste(i,'_quant', sep = '')))),
-                  envChgSteps=5,
-                  dispSteps=1,
-                  dispKernel=c(.1),
-                  iniMatAge=1,
-                  propaguleProd=c(1),
-                  lddFreq=0.05,
-                  lddMinDist=3,
-                  lddMaxDist=4,
-                  simulName=paste(i,'_test', sep = ''),
-                  replicateNb=1,
-                  overWrite=TRUE,
-                  testMode=FALSE,
-                  fullOutput=FALSE,
-                  keepTempFiles=TRUE)
-
-  unlink(paste('./',i,'_test/',i,'_test_raster.asc', sep =''))
-  
-  MigClim.migrate(iniDist = paste(i,"_ini_south_final", sep = ''),
-                  hsMap=paste(i,'_hs', sep = ''),
-                  rcThreshold = round(as.numeric(get(paste(i,'_quant', sep = '')))),
-                  envChgSteps=5,
-                  dispSteps=1,
-                  dispKernel=c(.1),
-                  iniMatAge=1, 
-                  propaguleProd=c(1),
-                  lddFreq=0.05, 
-                  lddMinDist=3, 
-                  lddMaxDist=4,
-                  simulName=paste(i,'_south_test', sep = ''), 
-                  replicateNb=1,
-                  overWrite=TRUE,
-                  testMode=FALSE, 
-                  fullOutput=FALSE, 
-                  keepTempFiles=TRUE)
-  
-  unlink(paste('./',i,'_south_test/',i,'_south_test_raster.asc', sep =''))
-  
-  end <- paste(i, 'end', Sys.time())
-  
-  time <- rbind(start, end)
-  
-  write.table(time, "time.csv", sep = ",", col.names = FALSE, append = TRUE)
-}, future.seed = TRUE)
+print('Conversion complete')
 
 #Next, run all of the scenarios from the original list/script using 07a on the cluster
+
