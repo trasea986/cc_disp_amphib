@@ -9,6 +9,8 @@ sp_ls <- c("ABMA", "ANBO", "ANHE", "LISY", "PSMA", "RALU")
 #move to env. only needed if the loop in 04_maxent.R was used
 #list2env(MaxEnt_list, .GlobalEnv)
 
+#jump to line 38 if best model .rds file already created from running this before
+
 #predict to NA present, and future
 
 #determine which model had the best AUC, note that first in sequence is 0
@@ -188,17 +190,17 @@ PSMA_quant <- quantile(PSMA_ENM_values, probs = 0.10, na.rm = TRUE)
 RALU_quant <- quantile(RALU_ENM_values, probs = 0.10, na.rm = TRUE)
 
 
-ABMA_ini <- reclassify(ABMA_ini_SDM, c(0, ABMA_quant, 0,
+ABMA_ini <- reclassify(ABMA_ini_SDM, c(-1, ABMA_quant, 0,
                                                ABMA_quant, 1000, 1))
-ANBO_ini <- reclassify(ANBO_ini_SDM, c(0, ANBO_quant, 0,
+ANBO_ini <- reclassify(ANBO_ini_SDM, c(-1, ANBO_quant, 0,
                                        ANBO_quant, 1000, 1))
-ANHE_ini <- reclassify(ANHE_ini_SDM, c(0, ANHE_quant, 0,
+ANHE_ini <- reclassify(ANHE_ini_SDM, c(-1, ANHE_quant, 0,
                                        ANHE_quant, 1000, 1))
-LISY_ini <- reclassify(LISY_ini_SDM, c(0, LISY_quant, 0,
+LISY_ini <- reclassify(LISY_ini_SDM, c(-1, LISY_quant, 0,
                                        LISY_quant, 1000, 1))
-PSMA_ini <- reclassify(PSMA_ini_SDM, c(0, PSMA_quant, 0,
+PSMA_ini <- reclassify(PSMA_ini_SDM, c(-1, PSMA_quant, 0,
                                        PSMA_quant, 1000, 1))
-RALU_ini <- reclassify(RALU_ini_SDM, c(0, RALU_quant, 0,
+RALU_ini <- reclassify(RALU_ini_SDM, c(-1, RALU_quant, 0,
                                        RALU_quant, 1000, 1))
 
 writeRaster(ABMA_ini, filename='./outputs/maxent/ABMA_ini.tif', format="GTiff", overwrite = TRUE)
@@ -296,15 +298,15 @@ RALU_ini_south_SDM <- raster(RALU_ini_south_SDM)
 
 ABMA_ini_south <- reclassify(ABMA_ini_south_SDM, c(-1, ABMA_quant, 0,
                                                    ABMA_quant, 1000, 1))
-ANBO_ini_south <- reclassify(ANBO_ini_south_SDM, c(0, ANBO_quant, 0,
+ANBO_ini_south <- reclassify(ANBO_ini_south_SDM, c(-1, ANBO_quant, 0,
                                                    ANBO_quant, 1000, 1))
-ANHE_ini_south <- reclassify(ANHE_ini_south_SDM, c(0, ANHE_quant, 0,
+ANHE_ini_south <- reclassify(ANHE_ini_south_SDM, c(-1, ANHE_quant, 0,
                                                    ANHE_quant, 1000, 1))
-LISY_ini_south <- reclassify(LISY_ini_south_SDM, c(0, LISY_quant, 0,
+LISY_ini_south <- reclassify(LISY_ini_south_SDM, c(-1, LISY_quant, 0,
                                                    LISY_quant, 1000, 1))
-PSMA_ini_south <- reclassify(PSMA_ini_south_SDM, c(0, PSMA_quant, 0,
+PSMA_ini_south <- reclassify(PSMA_ini_south_SDM, c(-1, PSMA_quant, 0,
                                                    PSMA_quant, 1000, 1))
-RALU_ini_south <- reclassify(RALU_ini_south_SDM, c(0, RALU_quant, 0,
+RALU_ini_south <- reclassify(RALU_ini_south_SDM, c(-1, RALU_quant, 0,
                                                    RALU_quant, 1000, 1))
 
 writeRaster(ABMA_ini_south, filename='./outputs/maxent/ABMA_ini_south.tif', format="GTiff", overwrite = TRUE)
