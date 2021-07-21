@@ -167,7 +167,7 @@ future_lapply(cc_list, function(c) {
   write.table(time, "time.csv", sep = ",", col.names = FALSE, append = TRUE)
 
   }, future.seed = TRUE)
-})
+}, future.seed = TRUE)
 
 print('Conversion complete')
 
