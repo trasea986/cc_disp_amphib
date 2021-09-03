@@ -339,7 +339,7 @@ future_lapply(sp_ls, function(i) {
                    dispKernel=c(0.78, 0.61, 0.47, 0.37, 0.29, 0.22, 0.17, 0.14, 0.11),
                    iniMatAge=1, propaguleProd=c(1),
                    #lddFreq=0.05, lddMinDist=3, lddMaxDist=4,
-                   simulName=paste(i,'_distance45', sep = ''), replicateNb=5, overWrite=TRUE,
+                   simulName=paste("full_",i,'_distance45', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
   unlink(paste('./full_',i,'_distance45/full_',i,'_distance451_raster.asc', sep =''))
   unlink(paste('./full_',i,'_distance45/full_',i,'_distance452_raster.asc', sep =''))
@@ -1274,7 +1274,7 @@ future_lapply(sp_ls, function(i) {
                    dispKernel=c(0.78, 0.61, 0.47, 0.37, 0.29, 0.22, 0.17, 0.14, 0.11),
                    iniMatAge=1, propaguleProd=c(1),
                    #lddFreq=0.05, lddMinDist=3, lddMaxDist=4,
-                   simulName=paste(i,'_distance45', sep = ''), replicateNb=5, overWrite=TRUE,
+                   simulName=paste("full_",i,'_distance45', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
   unlink(paste('./full_',i,'_distance45/full_',i,'_distance451_raster.asc', sep =''))
   unlink(paste('./full_',i,'_distance45/full_',i,'_distance452_raster.asc', sep =''))
@@ -2209,7 +2209,7 @@ future_lapply(sp_ls, function(i) {
                    dispKernel=c(0.78, 0.61, 0.47, 0.37, 0.29, 0.22, 0.17, 0.14, 0.11),
                    iniMatAge=1, propaguleProd=c(1),
                    #lddFreq=0.05, lddMinDist=3, lddMaxDist=4,
-                   simulName=paste(i,'_distance45', sep = ''), replicateNb=5, overWrite=TRUE,
+                   simulName=paste("full_",i,'_distance45', sep = ''), replicateNb=5, overWrite=TRUE,
                    testMode=FALSE, fullOutput=FALSE, keepTempFiles=TRUE)
   unlink(paste('./full_',i,'_distance45/full_',i,'_distance451_raster.asc', sep =''))
   unlink(paste('./full_',i,'_distance45/full_',i,'_distance452_raster.asc', sep =''))
