@@ -46,7 +46,7 @@ df_migclim <- df_migclim %>%
   separate(col = run, 
            into = c('range', 'species', 'runinfo', "junk1"), sep = "_")
 
-df_migclim_test$junk1 <- NULL
+df_migclim$junk1 <- NULL
 
 #need to break up simulation name by the text name and the value used after pulling species (and deleting species, which was created above)
 df_migclim <- df_migclim %>%
@@ -67,7 +67,7 @@ df_migclim <- df_migclim %>%
 #note that initial count, unlimited dispersal count, and no dispersal counts do not vary with run, but calculating mean and things here so that grouping in final table remains
 prop <- df_migclim %>%
   group_by(species, SSP, range) %>%
-  summarize(ini_km = (mean(iniCount) * 576.9299/1000),
+  summarize(ini_km = (mean(iniCount) * (576.9299/1000)),
             zero_prop = ((min(noDispCount)-mean(iniCount))/mean(iniCount)),
             unlim_prop = ((max(univDispCount)-mean(iniCount))/mean(iniCount)),
             avg_disp_prop = ((mean(occupiedCount)-mean(iniCount))/mean(iniCount)),
@@ -86,4 +86,4 @@ all_sp <- prop %>%
   group_by(SSP, range) %>%
   summarise(across(ini_km:max_disp_prop, ~ mean(.x, na.rm = TRUE)))
 
-write.csv(prop_average, "table3_all_sp_avg.csv")
+write.csv(all_sp, "table3_all_sp_avg.csv")

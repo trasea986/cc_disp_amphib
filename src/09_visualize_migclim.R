@@ -3,6 +3,82 @@ library(tidyverse)
 library(maptools)
 library(ggthemes)
 
+#load in the counties for mapping
+world <- ne_countries(scale = "medium", returnclass = "sf")
+
+#reproject world map
+world_repro <- st_transform(world, CRS("ESRI:102008"))
+
+#create list of species
+sp_ls <- c("ABMA", "ANBO", "ANHE", "LISY", "PSMA", "RALU")
+
+#prior to visualizing migclim, going to bring in the different hs5 prediction maps to highlight the differences between the 3 SSPs. some space issues if doing all of these rasters in single stacks, so splitting up.
+
+ABMA_ssp245 <- raster('./outputs/maxent/rasters/ssp245/ABMA_hs5.tif')
+ABMA_ssp370 <- raster('./outputs/maxent/rasters/ssp370/ABMA_hs5.tif')
+ABMA_ssp585 <- raster('./outputs/maxent/rasters/ssp585/ABMA_hs5.tif')
+ANBO_ssp245 <- raster('./outputs/maxent/rasters/ssp245/ANBO_hs5.tif')
+ANBO_ssp370 <- raster('./outputs/maxent/rasters/ssp370/ANBO_hs5.tif')
+ANBO_ssp585 <- raster('./outputs/maxent/rasters/ssp585/ANBO_hs5.tif')
+ANHE_ssp245 <- raster('./outputs/maxent/rasters/ssp245/ANHE_hs5.tif')
+ANHE_ssp370 <- raster('./outputs/maxent/rasters/ssp370/ANHE_hs5.tif')
+ANHE_ssp585 <- raster('./outputs/maxent/rasters/ssp585/ANHE_hs5.tif')
+LISY_ssp245 <- raster('./outputs/maxent/rasters/ssp245/LISY_hs5.tif')
+LISY_ssp370 <- raster('./outputs/maxent/rasters/ssp370/LISY_hs5.tif')
+LISY_ssp585 <- raster('./outputs/maxent/rasters/ssp585/LISY_hs5.tif')
+PSMA_ssp245 <- raster('./outputs/maxent/rasters/ssp245/PSMA_hs5.tif')
+PSMA_ssp370 <- raster('./outputs/maxent/rasters/ssp370/PSMA_hs5.tif')
+PSMA_ssp585 <- raster('./outputs/maxent/rasters/ssp585/PSMA_hs5.tif')
+RALU_ssp245 <- raster('./outputs/maxent/rasters/ssp245/RALU_hs5.tif')
+RALU_ssp370 <- raster('./outputs/maxent/rasters/ssp370/RALU_hs5.tif')
+RALU_ssp585 <- raster('./outputs/maxent/rasters/ssp585/RALU_hs5.tif')
+
+HS_stacked_245 <- stack(ABMA_ssp245, ANBO_ssp245, ANHE_ssp245, LISY_ssp245, PSMA_ssp245, RALU_ssp245)
+HS_stacked_370 <- stack(ABMA_ssp370, ANBO_ssp370, ANHE_ssp370, LISY_ssp370, PSMA_ssp370, RALU_ssp370)
+HS_stacked_585 <- stack(ABMA_ssp585, ANBO_ssp585, ANHE_ssp585, LISY_ssp585, PSMA_ssp585, RALU_ssp585)
+
+HS_stacked_245 <- aggregate(HS_stacked_245, fact=8, fun = modal)
+HS_stacked_370 <- aggregate(HS_stacked_370, fact=8, fun = modal)
+HS_stacked_585 <- aggregate(HS_stacked_585, fact=8, fun = modal)
+
+#create dataframes for ggplot from the rasters
+#note that doing this in a list creates very large objects, so again keep broken up
+ssp245_list <- list()
+for (i in sp_ls) {
+  df <- as.data.frame(get(paste(i,"_ssp245", sep='')), xy=TRUE)
+  ssp245_list[[i]] <- df
+}
+
+ssp370_list <- list()
+for (i in sp_ls) {
+  df <- as.data.frame(get(paste(i,"_ssp370", sep='')), xy=TRUE)
+  ssp370_list[[i]] <- df
+}
+
+ssp585_list <- list()
+for (i in sp_ls) {
+  df <- as.data.frame(get(paste(i,"_ssp585", sep='')), xy=TRUE)
+  ssp585_list[[i]] <- df
+}
+
+#remove NAs
+ssp245_list <- lapply(ssp245_list, function(i){na.omit(i)})
+names(ssp245_list) <- c("ABMA_245_df", "ANBO_245_df", "ANHE_245_df", "LISY_245_df", "PSMA_245_df", "RALU_245_df")
+
+ssp370_list <- lapply(ssp370_list, function(i){na.omit(i)})
+names(ssp370_list) <- c("ABMA_370_df", "ANBO_370_df", "ANHE_370_df", "LISY_370_df", "PSMA_370_df", "RALU_370_df")
+
+ssp585_list <- lapply(ssp585_list, function(i){na.omit(i)})
+names(ssp585_list) <- c("ABMA_585_df", "ANBO_585_df", "ANHE_585_df", "LISY_585_df", "PSMA_585_df", "RALU_585_df")
+
+
+
+
+
+
+
+
+
 #read in the MigClim raster that was created
 migclim_output <- raster('ABMA_test/ABMA_test_raster.asc')
 
@@ -53,3 +129,32 @@ migclim_map <- ggplot() +
   theme(legend.title=element_blank())
 
 ggsave("migclim_map.png", plot = migclim_map, width = 12, height = 12, units="in", dpi = 300)
+
+
+#function to create plots and save each one as a .png
+plotstuff <- function(dataset, name) {
+  plot_title <- paste("Plot of ", name, sep=" ")
+  ggplot(dataset, aes(x=BPcum, y=-log10(pval))) + #change pval to score if desired
+    # Show all points
+    geom_point( aes(color=as.factor(chr)), alpha=0.8, size=1.3) +
+    scale_color_manual(values = rep(c("grey", "skyblue"), 22 )) +
+    #add in Bonferroni corrected line
+    geom_hline(yintercept=-log10(1.187e-8), color = "darkred") +
+    # custom X axis:
+    scale_x_continuous( label = axisdf$chr, breaks= axisdf$center ) +
+    scale_y_continuous(expand = c(0, 0) ) +     # remove space between plot area and x axis
+    # Custom the theme:
+    ggtitle(plot_title) +
+    theme_classic() +
+    theme( 
+      legend.position="none",
+      panel.border = element_blank(),
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.x = element_blank()
+    )
+  ggsave(filename = paste(plot_title,".png", sep = ""), plot = last_plot())
+}
+
+#run function, which will display each plot, but will also create an object so individual plots can be called again
+
+mapply(plotstuff, dataset = auto_lm_env, name = names(auto_lm_env))
