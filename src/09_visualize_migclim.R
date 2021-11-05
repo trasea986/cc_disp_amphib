@@ -9,6 +9,7 @@ library(cowplot)
 
 #figure 1 is the change in hs 1 and 5
 #figure 2 is the migclim for 585
+#figure 3 is the migclim for 585, southern range
 #supp 6 will be enm 245
 #supp 7 will be enm 370
 #supp 8 will be enm 585
@@ -16,6 +17,8 @@ library(cowplot)
 #supp 10 will be change hs 1 and 5 ssp 370
 #supp 11 will be migclim 245
 #supp 12 will be migclim 370
+#supp 13 will be migclim 245, southern range
+#supp 14 will be migclim 370, southern range
 
 #load in the counties for mapping
 world <- ne_countries(scale = "medium", returnclass = "sf")
@@ -713,84 +716,777 @@ ggsave("./outputs/figure1_ssp585.png", plot = plot_maps,
 
 
 # migclim -----------------------------------------------------------------
-
-
-#read in the MigClim raster that was created
-migclim_output <- raster('ABMA_test/ABMA_test_raster.asc')
-
 #here are the value ranges from the output
 #0 [no color] Cells that have never been occupied and are unsuitable habitat at the end of the simulation. There are several reasons why a cell can remain non-colonized
 #1 (black) Cells that belong to the species' initial distribution and that have remained occupied during the entire simulation.
 #1 < value < 30000  #Positive values greater than 1 but smaller then 30000 represent cells that have been colonized during the simulation and that remain occupied at the end of the simulation. The value of the cell allows to determine the dispersal step during which it was colonized using the following code: each environmental change step  given a value of 100 and each dispersal step a value of 1. Here are some examples 101 = 1st dispersal step of 1st environmental change step (1 × 1 + 1 × 100 = 101). 102 = 2nd dispersal step of 1st environmental change step (2 × 1 + 1 × 100 = 102). 504 = 4th dispersal step of 5th environmental change step (4 × 1 + 5 × 100 = 504). 1003 = 3rd dispersal step of 10th environmental change step (3 × 1 + 10 × 100 = 101).
 #30,000 [pink] Cells that are potentially suitable (i.e. habitat is favorable) but that were not colonized due to dispersal
 # Value < 1 [grey] Negative values indicate cells that were once occupied but have become decolonized, because their habitat has turned unsuitable. Their absolute value allows determining the exact time when they have been decolonized using the same code as explained just above.
+#these are color by species, all using the same, so can loop it for each individual image, but want to combine in R
 
+#read in the MigClim raster that was created
 
+ABMA_migclim <- raster('outputs/migclim/ssp245/full_ABMA_base/full_ABMA_base1_raster.asc')
+ANBO_migclim <- raster('outputs/migclim/ssp245/full_ANBO_base/full_ANBO_base1_raster.asc')
+ANHE_migclim <- raster('outputs/migclim/ssp245/full_ANHE_base/full_ANHE_base1_raster.asc')
+LISY_migclim <- raster('outputs/migclim/ssp245/full_LISY_base/full_LISY_base1_raster.asc')
+PSMA_migclim <- raster('outputs/migclim/ssp245/full_PSMA_base/full_PSMA_base1_raster.asc')
+RALU_migclim <- raster('outputs/migclim/ssp245/full_RALU_base/full_RALU_base1_raster.asc')
 
-#I don't want to see each individual time steps colonization and instead just want to summarize, so I will reclassify to simply the values from above, and the plot and name accordingly
+migclim_stack_245 <- stack(ABMA_migclim, ANBO_migclim, ANHE_migclim, LISY_migclim, PSMA_migclim, RALU_migclim)
+
+migclim_processed_245 <- list()
+for (i in 1:6) {
+#aggregate for plotting
+migclim_output <- aggregate(migclim_stack_245[[i]], fact=8, fun = modal)
+
+#I don't want to see each individual time steps colonization and instead just want to summarize, so I will reclassify to simplify the values from above, and the plot and name accordingly
 migclim_plot <- reclassify(migclim_output, c(-29999, -0.00001, 1, #lost initial
                                              -0.00001,0.00001,2, #never suitable
                                              0.000011, 1.0001, 3, #maintained initial
                                              1.0002, 29999, 4, #suitable, colonized
                                              29999.01,30005,5)) #suitable, vacant
-#next, crop to the area of interest
-ext <- extent(-135, -110, 30, 60)
-migclim_plot <- crop(migclim_plot, ext)
+
 
 #convert migclim_output to dataframe for ggplot. converting original as well for factor check
-migclim_plot_df <- as.data.frame(migclim_plot, xy = TRUE)
+migclim_plot_df <- as.data.frame(migclim_plot, xy = TRUE, na.rm = TRUE)
 
 #note that need to specify it is a factor
-migclim_plot_df$migclim <- as.factor(migclim_plot_df$ABMA_test_raster)
-
-#going to load in country outline and then plot
-dmap <- maps::map("world", regions=c('USA', 'Canada'), col="transparent", plot=FALSE, fill = TRUE)
-
-area_poly <- map2SpatialPolygons(dmap, IDs = dmap$names, proj4string=CRS("+proj=longlat +datum=WGS84"))
-
-#set map extent and crop out country bits you don't want
-
-area_poly_map <- crop(area_poly, ext)
-
-migclim_map <- ggplot() +
-  geom_tile(data=migclim_plot_df, aes(x=x, y=y, fill=migclim)) +
-  scale_fill_manual(values = c("orange", "white", "darkgrey", "darkblue", "green"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
-  geom_polygon(data = area_poly_map, mapping = aes(x = long, y = lat, group = group), color = "black", fill = NA) + #black lines for the states
-  coord_fixed(1.3) + 
-  ggtitle("Ambystoma macrodactylum") + 
-  theme_map(base_size = 16) + 
-  theme(legend.position="bottom") + 
-  theme(plot.title = element_text(face = "italic")) + 
-  theme(legend.key.width=unit(1, "cm")) +
-  theme(legend.title=element_blank())
-
-ggsave("migclim_map.png", plot = migclim_map, width = 12, height = 12, units="in", dpi = 300)
-
-
-#function to create plots and save each one as a .png
-plotstuff <- function(dataset, name) {
-  plot_title <- paste("Plot of ", name, sep=" ")
-  ggplot(dataset, aes(x=BPcum, y=-log10(pval))) + #change pval to score if desired
-    # Show all points
-    geom_point( aes(color=as.factor(chr)), alpha=0.8, size=1.3) +
-    scale_color_manual(values = rep(c("grey", "skyblue"), 22 )) +
-    #add in Bonferroni corrected line
-    geom_hline(yintercept=-log10(1.187e-8), color = "darkred") +
-    # custom X axis:
-    scale_x_continuous( label = axisdf$chr, breaks= axisdf$center ) +
-    scale_y_continuous(expand = c(0, 0) ) +     # remove space between plot area and x axis
-    # Custom the theme:
-    ggtitle(plot_title) +
-    theme_classic() +
-    theme( 
-      legend.position="none",
-      panel.border = element_blank(),
-      panel.grid.major.x = element_blank(),
-      panel.grid.minor.x = element_blank()
-    )
-  ggsave(filename = paste(plot_title,".png", sep = ""), plot = last_plot())
+migclim_processed_245[[i]] <- migclim_plot_df
 }
 
-#run function, which will display each plot, but will also create an object so individual plots can be called again
+ABMA_migclim <- raster('outputs/migclim/ssp370/full_ABMA_base/full_ABMA_base1_raster.asc')
+ANBO_migclim <- raster('outputs/migclim/ssp370/full_ANBO_base/full_ANBO_base1_raster.asc')
+ANHE_migclim <- raster('outputs/migclim/ssp370/full_ANHE_base/full_ANHE_base1_raster.asc')
+LISY_migclim <- raster('outputs/migclim/ssp370/full_LISY_base/full_LISY_base1_raster.asc')
+PSMA_migclim <- raster('outputs/migclim/ssp370/full_PSMA_base/full_PSMA_base1_raster.asc')
+RALU_migclim <- raster('outputs/migclim/ssp370/full_RALU_base/full_RALU_base1_raster.asc')
 
-mapply(plotstuff, dataset = auto_lm_env, name = names(auto_lm_env))
+migclim_stack_370 <- stack(ABMA_migclim, ANBO_migclim, ANHE_migclim, LISY_migclim, PSMA_migclim, RALU_migclim)
+
+migclim_processed_370 <- list()
+for (i in 1:6) {
+  #aggregate for plotting
+  migclim_output <- aggregate(migclim_stack_370[[i]], fact=8, fun = modal)
+  
+  #I don't want to see each individual time steps colonization and instead just want to summarize, so I will reclassify to simplify the values from above, and the plot and name accordingly
+  migclim_plot <- reclassify(migclim_output, c(-29999, -0.00001, 1, #lost initial
+                                               -0.00001,0.00001,2, #never suitable
+                                               0.000011, 1.0001, 3, #maintained initial
+                                               1.0002, 29999, 4, #suitable, colonized
+                                               29999.01,30005,5)) #suitable, vacant
+  
+  
+  #convert migclim_output to dataframe for ggplot. converting original as well for factor check
+  migclim_plot_df <- as.data.frame(migclim_plot, xy = TRUE, na.rm = TRUE)
+  
+  #note that need to specify it is a factor
+  migclim_processed_370[[i]] <- migclim_plot_df
+}
+
+ABMA_migclim <- raster('outputs/migclim/ssp585/full_ABMA_base/full_ABMA_base1_raster.asc')
+ANBO_migclim <- raster('outputs/migclim/ssp585/full_ANBO_base/full_ANBO_base1_raster.asc')
+ANHE_migclim <- raster('outputs/migclim/ssp585/full_ANHE_base/full_ANHE_base1_raster.asc')
+LISY_migclim <- raster('outputs/migclim/ssp585/full_LISY_base/full_LISY_base1_raster.asc')
+PSMA_migclim <- raster('outputs/migclim/ssp585/full_PSMA_base/full_PSMA_base1_raster.asc')
+RALU_migclim <- raster('outputs/migclim/ssp585/full_RALU_base/full_RALU_base1_raster.asc')
+
+migclim_stack_245 <- stack(ABMA_migclim, ANBO_migclim, ANHE_migclim, LISY_migclim, PSMA_migclim, RALU_migclim)
+
+migclim_processed_585 <- list()
+for (i in 1:6) {
+  #aggregate for plotting
+  migclim_output <- aggregate(migclim_stack_585[[i]], fact=8, fun = modal)
+  
+  #I don't want to see each individual time steps colonization and instead just want to summarize, so I will reclassify to simplify the values from above, and the plot and name accordingly
+  migclim_plot <- reclassify(migclim_output, c(-29999, -0.00001, 1, #lost initial
+                                               -0.00001,0.00001,2, #never suitable
+                                               0.000011, 1.0001, 3, #maintained initial
+                                               1.0002, 29999, 4, #suitable, colonized
+                                               29999.01,30005,5)) #suitable, vacant
+  
+  
+  #convert migclim_output to dataframe for ggplot. converting original as well for factor check
+  migclim_plot_df <- as.data.frame(migclim_plot, xy = TRUE, na.rm = TRUE)
+  
+  #note that need to specify it is a factor
+  migclim_processed_585[[i]] <- migclim_plot_df
+}
+
+#add names
+names(migclim_processed_245) <- c("ABMA_245mig_df", "ANBO_245mig_df", "ANHE_245mig_df", "LISY_245mig_df", "PSMA_245mig_df", "RALU_245mig_df")
+names(migclim_processed_370) <- c("ABMA_370mig_df", "ANBO_370mig_df", "ANHE_370mig_df", "LISY_370mig_df", "PSMA_370mig_df", "RALU_370mig_df")
+names(migclim_processed_585) <- c("ABMA_585mig_df", "ANBO_585mig_df", "ANHE_585mig_df", "LISY_585mig_df", "PSMA_585mig_df", "RALU_585mig_df")
+
+list2env(migclim_processed_245, .GlobalEnv)
+list2env(migclim_processed_370, .GlobalEnv)
+list2env(migclim_processed_585, .GlobalEnv)
+
+
+# migclim 245 -------------------------------------------------------------
+#set map extent and crop out country bits you don't want
+#need to do as.factor for the fill
+ABMA_migclim <- ggplot() + 
+  geom_tile(data=ABMA_245mig_df, aes(x=x, y=y, fill=as.factor(full_ABMA_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+ANBO_migclim <- ggplot() + 
+  geom_tile(data=ANBO_245mig_df, aes(x=x, y=y, fill=as.factor(full_ANBO_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+ANHE_migclim <- ggplot() + 
+  geom_tile(data=ANHE_245mig_df, aes(x=x, y=y, fill=as.factor(full_ANHE_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+LISY_migclim <- ggplot() + 
+  geom_tile(data=LISY_245mig_df, aes(x=x, y=y, fill=as.factor(full_LISY_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+PSMA_migclim <- ggplot() + 
+  geom_tile(data=PSMA_245mig_df, aes(x=x, y=y, fill=as.factor(full_PSMA_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+RALU_migclim <- ggplot() + 
+  geom_tile(data=RALU_245mig_df, aes(x=x, y=y, fill=as.factor(full_RALU_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+legend_b <- get_legend(
+  RALU_migclim + 
+    scale_fill_manual(name = "Distribution", 
+                      values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), 
+                      labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'),
+                      na.translate=FALSE) +
+    guides(color = guide_legend(nrow = 1)) +
+    theme(legend.position = "top")
+)
+
+plot_legend <- plot_grid(legend_b, labels = c(''))
+
+plot_maps <- plot_grid(ABMA_migclim, ANBO_migclim, ANHE_migclim, LISY_migclim, PSMA_migclim, RALU_migclim, labels = c('','', '', '', '', '',''), label_size = 2, ncol = 3, rel_heights = c(1,1,1,1,1,1,1))
+
+plot_final <- plot_grid(plot_legend, plot_maps, ncol = 1, rel_heights = c(.1,1))
+
+ggsave("./outputs/supp_figure11_245.png", plot = plot_final, 
+       width = 12, height = 9, dpi = 600)
+
+
+# migclim 370 -------------------------------------------------------------
+#set map extent and crop out country bits you don't want
+#need to do as.factor for the fill
+ABMA_migclim <- ggplot() + 
+  geom_tile(data=ABMA_370mig_df, aes(x=x, y=y, fill=as.factor(full_ABMA_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+ANBO_migclim <- ggplot() + 
+  geom_tile(data=ANBO_370mig_df, aes(x=x, y=y, fill=as.factor(full_ANBO_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+ANHE_migclim <- ggplot() + 
+  geom_tile(data=ANHE_370mig_df, aes(x=x, y=y, fill=as.factor(full_ANHE_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+LISY_migclim <- ggplot() + 
+  geom_tile(data=LISY_370mig_df, aes(x=x, y=y, fill=as.factor(full_LISY_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+PSMA_migclim <- ggplot() + 
+  geom_tile(data=PSMA_370mig_df, aes(x=x, y=y, fill=as.factor(full_PSMA_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+RALU_migclim <- ggplot() + 
+  geom_tile(data=RALU_370mig_df, aes(x=x, y=y, fill=as.factor(full_RALU_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+legend_b <- get_legend(
+  RALU_migclim + 
+    scale_fill_manual(name = "Distribution", 
+                      values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), 
+                      labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'),
+                      na.translate=FALSE) +
+    guides(color = guide_legend(nrow = 1)) +
+    theme(legend.position = "top")
+)
+
+plot_legend <- plot_grid(legend_b, labels = c(''))
+
+plot_maps <- plot_grid(ABMA_migclim, ANBO_migclim, ANHE_migclim, LISY_migclim, PSMA_migclim, RALU_migclim, labels = c('','', '', '', '', '',''), label_size = 2, ncol = 3, rel_heights = c(1,1,1,1,1,1,1))
+
+plot_final <- plot_grid(plot_legend, plot_maps, ncol = 1, rel_heights = c(.1,1))
+
+ggsave("./outputs/supp_figure12_370.png", plot = plot_final, 
+       width = 12, height = 9, dpi = 600)
+
+# migclim 585 -------------------------------------------------------------
+#set map extent and crop out country bits you don't want
+#need to do as.factor for the fill
+ABMA_migclim <- ggplot() + 
+  geom_tile(data=ABMA_585mig_df, aes(x=x, y=y, fill=as.factor(full_ABMA_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+ANBO_migclim <- ggplot() + 
+  geom_tile(data=ANBO_585mig_df, aes(x=x, y=y, fill=as.factor(full_ANBO_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+ANHE_migclim <- ggplot() + 
+  geom_tile(data=ANHE_585mig_df, aes(x=x, y=y, fill=as.factor(full_ANHE_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+LISY_migclim <- ggplot() + 
+  geom_tile(data=LISY_585mig_df, aes(x=x, y=y, fill=as.factor(full_LISY_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+PSMA_migclim <- ggplot() + 
+  geom_tile(data=PSMA_585mig_df, aes(x=x, y=y, fill=as.factor(full_PSMA_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+RALU_migclim <- ggplot() + 
+  geom_tile(data=RALU_585mig_df, aes(x=x, y=y, fill=as.factor(full_RALU_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+legend_b <- get_legend(
+  RALU_migclim + 
+    scale_fill_manual(name = "Distribution", 
+                      values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), 
+                      labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'),
+                      na.translate=FALSE) +
+    guides(color = guide_legend(nrow = 1)) +
+    theme(legend.position = "top")
+)
+
+plot_legend <- plot_grid(legend_b, labels = c(''))
+
+plot_maps <- plot_grid(ABMA_migclim, ANBO_migclim, ANHE_migclim, LISY_migclim, PSMA_migclim, RALU_migclim, labels = c('','', '', '', '', '',''), label_size = 2, ncol = 3, rel_heights = c(1,1,1,1,1,1,1))
+
+plot_final <- plot_grid(plot_legend, plot_maps, ncol = 1, rel_heights = c(.1,1))
+
+ggsave("./outputs/supp_figure2_585.png", plot = plot_final, 
+       width = 12, height = 9, dpi = 600)
+
+
+
+# migclim south -----------------------------------------------------------
+#same as above but pull in the south raster. script kept the same otherwise except for updating ggsave
+ABMA_migclim <- raster('outputs/migclim/ssp245/south_ABMA_base/south_ABMA_base1_raster.asc')
+ANBO_migclim <- raster('outputs/migclim/ssp245/south_ANBO_base/south_ANBO_base1_raster.asc')
+ANHE_migclim <- raster('outputs/migclim/ssp245/south_ANHE_base/south_ANHE_base1_raster.asc')
+LISY_migclim <- raster('outputs/migclim/ssp245/south_LISY_base/south_LISY_base1_raster.asc')
+PSMA_migclim <- raster('outputs/migclim/ssp245/south_PSMA_base/south_PSMA_base1_raster.asc')
+RALU_migclim <- raster('outputs/migclim/ssp245/south_RALU_base/south_RALU_base1_raster.asc')
+
+migclim_stack_245 <- stack(ABMA_migclim, ANBO_migclim, ANHE_migclim, LISY_migclim, PSMA_migclim, RALU_migclim)
+
+migclim_processed_245 <- list()
+for (i in 1:6) {
+  #aggregate for plotting
+  migclim_output <- aggregate(migclim_stack_245[[i]], fact=8, fun = modal)
+  
+  #I don't want to see each individual time steps colonization and instead just want to summarize, so I will reclassify to simplify the values from above, and the plot and name accordingly
+  migclim_plot <- reclassify(migclim_output, c(-29999, -0.00001, 1, #lost initial
+                                               -0.00001,0.00001,2, #never suitable
+                                               0.000011, 1.0001, 3, #maintained initial
+                                               1.0002, 29999, 4, #suitable, colonized
+                                               29999.01,30005,5)) #suitable, vacant
+  
+  
+  #convert migclim_output to dataframe for ggplot. converting original as well for factor check
+  migclim_plot_df <- as.data.frame(migclim_plot, xy = TRUE, na.rm = TRUE)
+  
+  #note that need to specify it is a factor
+  migclim_processed_245[[i]] <- migclim_plot_df
+}
+
+ABMA_migclim <- raster('outputs/migclim/ssp370/south_ABMA_base/south_ABMA_base1_raster.asc')
+ANBO_migclim <- raster('outputs/migclim/ssp370/south_ANBO_base/south_ANBO_base1_raster.asc')
+ANHE_migclim <- raster('outputs/migclim/ssp370/south_ANHE_base/south_ANHE_base1_raster.asc')
+LISY_migclim <- raster('outputs/migclim/ssp370/south_LISY_base/south_LISY_base1_raster.asc')
+PSMA_migclim <- raster('outputs/migclim/ssp370/south_PSMA_base/south_PSMA_base1_raster.asc')
+RALU_migclim <- raster('outputs/migclim/ssp370/south_RALU_base/south_RALU_base1_raster.asc')
+
+migclim_stack_370 <- stack(ABMA_migclim, ANBO_migclim, ANHE_migclim, LISY_migclim, PSMA_migclim, RALU_migclim)
+
+migclim_processed_370 <- list()
+for (i in 1:6) {
+  #aggregate for plotting
+  migclim_output <- aggregate(migclim_stack_370[[i]], fact=8, fun = modal)
+  
+  #I don't want to see each individual time steps colonization and instead just want to summarize, so I will reclassify to simplify the values from above, and the plot and name accordingly
+  migclim_plot <- reclassify(migclim_output, c(-29999, -0.00001, 1, #lost initial
+                                               -0.00001,0.00001,2, #never suitable
+                                               0.000011, 1.0001, 3, #maintained initial
+                                               1.0002, 29999, 4, #suitable, colonized
+                                               29999.01,30005,5)) #suitable, vacant
+  
+  
+  #convert migclim_output to dataframe for ggplot. converting original as well for factor check
+  migclim_plot_df <- as.data.frame(migclim_plot, xy = TRUE, na.rm = TRUE)
+  
+  #note that need to specify it is a factor
+  migclim_processed_370[[i]] <- migclim_plot_df
+}
+
+ABMA_migclim <- raster('outputs/migclim/ssp585/south_ABMA_base/south_ABMA_base1_raster.asc')
+ANBO_migclim <- raster('outputs/migclim/ssp585/south_ANBO_base/south_ANBO_base1_raster.asc')
+ANHE_migclim <- raster('outputs/migclim/ssp585/south_ANHE_base/south_ANHE_base1_raster.asc')
+LISY_migclim <- raster('outputs/migclim/ssp585/south_LISY_base/south_LISY_base1_raster.asc')
+PSMA_migclim <- raster('outputs/migclim/ssp585/south_PSMA_base/south_PSMA_base1_raster.asc')
+RALU_migclim <- raster('outputs/migclim/ssp585/south_RALU_base/south_RALU_base1_raster.asc')
+
+migclim_stack_245 <- stack(ABMA_migclim, ANBO_migclim, ANHE_migclim, LISY_migclim, PSMA_migclim, RALU_migclim)
+
+migclim_processed_585 <- list()
+for (i in 1:6) {
+  #aggregate for plotting
+  migclim_output <- aggregate(migclim_stack_585[[i]], fact=8, fun = modal)
+  
+  #I don't want to see each individual time steps colonization and instead just want to summarize, so I will reclassify to simplify the values from above, and the plot and name accordingly
+  migclim_plot <- reclassify(migclim_output, c(-29999, -0.00001, 1, #lost initial
+                                               -0.00001,0.00001,2, #never suitable
+                                               0.000011, 1.0001, 3, #maintained initial
+                                               1.0002, 29999, 4, #suitable, colonized
+                                               29999.01,30005,5)) #suitable, vacant
+  
+  
+  #convert migclim_output to dataframe for ggplot. converting original as well for factor check
+  migclim_plot_df <- as.data.frame(migclim_plot, xy = TRUE, na.rm = TRUE)
+  
+  #note that need to specify it is a factor
+  migclim_processed_585[[i]] <- migclim_plot_df
+}
+
+#add names
+names(migclim_processed_245) <- c("ABMA_245mig_df", "ANBO_245mig_df", "ANHE_245mig_df", "LISY_245mig_df", "PSMA_245mig_df", "RALU_245mig_df")
+names(migclim_processed_370) <- c("ABMA_370mig_df", "ANBO_370mig_df", "ANHE_370mig_df", "LISY_370mig_df", "PSMA_370mig_df", "RALU_370mig_df")
+names(migclim_processed_585) <- c("ABMA_585mig_df", "ANBO_585mig_df", "ANHE_585mig_df", "LISY_585mig_df", "PSMA_585mig_df", "RALU_585mig_df")
+
+list2env(migclim_processed_245, .GlobalEnv)
+list2env(migclim_processed_370, .GlobalEnv)
+list2env(migclim_processed_585, .GlobalEnv)
+
+# migclim south 245 -------------------------------------------------------------
+#set map extent and crop out country bits you don't want
+#need to do as.factor for the fill
+ABMA_migclim <- ggplot() + 
+  geom_tile(data=ABMA_245mig_df, aes(x=x, y=y, fill=as.factor(south_ABMA_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+ANBO_migclim <- ggplot() + 
+  geom_tile(data=ANBO_245mig_df, aes(x=x, y=y, fill=as.factor(south_ANBO_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+ANHE_migclim <- ggplot() + 
+  geom_tile(data=ANHE_245mig_df, aes(x=x, y=y, fill=as.factor(south_ANHE_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+LISY_migclim <- ggplot() + 
+  geom_tile(data=LISY_245mig_df, aes(x=x, y=y, fill=as.factor(south_LISY_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+PSMA_migclim <- ggplot() + 
+  geom_tile(data=PSMA_245mig_df, aes(x=x, y=y, fill=as.factor(south_PSMA_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+RALU_migclim <- ggplot() + 
+  geom_tile(data=RALU_245mig_df, aes(x=x, y=y, fill=as.factor(south_RALU_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+legend_b <- get_legend(
+  RALU_migclim + 
+    scale_fill_manual(name = "Distribution", 
+                      values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), 
+                      labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'),
+                      na.translate=FALSE) +
+    guides(color = guide_legend(nrow = 1)) +
+    theme(legend.position = "top")
+)
+
+plot_legend <- plot_grid(legend_b, labels = c(''))
+
+plot_maps <- plot_grid(ABMA_migclim, ANBO_migclim, ANHE_migclim, LISY_migclim, PSMA_migclim, RALU_migclim, labels = c('','', '', '', '', '',''), label_size = 2, ncol = 3, rel_heights = c(1,1,1,1,1,1,1))
+
+plot_final <- plot_grid(plot_legend, plot_maps, ncol = 1, rel_heights = c(.1,1))
+
+ggsave("./outputs/supp_figure13_245.png", plot = plot_final, 
+       width = 12, height = 9, dpi = 600)
+
+
+# migclim south 370 -------------------------------------------------------------
+#set map extent and crop out country bits you don't want
+#need to do as.factor for the fill
+ABMA_migclim <- ggplot() + 
+  geom_tile(data=ABMA_370mig_df, aes(x=x, y=y, fill=as.factor(south_ABMA_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+ANBO_migclim <- ggplot() + 
+  geom_tile(data=ANBO_370mig_df, aes(x=x, y=y, fill=as.factor(south_ANBO_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+ANHE_migclim <- ggplot() + 
+  geom_tile(data=ANHE_370mig_df, aes(x=x, y=y, fill=as.factor(south_ANHE_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+LISY_migclim <- ggplot() + 
+  geom_tile(data=LISY_370mig_df, aes(x=x, y=y, fill=as.factor(south_LISY_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+PSMA_migclim <- ggplot() + 
+  geom_tile(data=PSMA_370mig_df, aes(x=x, y=y, fill=as.factor(south_PSMA_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+RALU_migclim <- ggplot() + 
+  geom_tile(data=RALU_370mig_df, aes(x=x, y=y, fill=as.factor(south_RALU_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+legend_b <- get_legend(
+  RALU_migclim + 
+    scale_fill_manual(name = "Distribution", 
+                      values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), 
+                      labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'),
+                      na.translate=FALSE) +
+    guides(color = guide_legend(nrow = 1)) +
+    theme(legend.position = "top")
+)
+
+plot_legend <- plot_grid(legend_b, labels = c(''))
+
+plot_maps <- plot_grid(ABMA_migclim, ANBO_migclim, ANHE_migclim, LISY_migclim, PSMA_migclim, RALU_migclim, labels = c('','', '', '', '', '',''), label_size = 2, ncol = 3, rel_heights = c(1,1,1,1,1,1,1))
+
+plot_final <- plot_grid(plot_legend, plot_maps, ncol = 1, rel_heights = c(.1,1))
+
+ggsave("./outputs/supp_figure14_370.png", plot = plot_final, 
+       width = 12, height = 9, dpi = 600)
+
+# migclim south 585 -------------------------------------------------------------
+#set map extent and crop out country bits you don't want
+#need to do as.factor for the fill
+ABMA_migclim <- ggplot() + 
+  geom_tile(data=ABMA_585mig_df, aes(x=x, y=y, fill=as.factor(south_ABMA_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+ANBO_migclim <- ggplot() + 
+  geom_tile(data=ANBO_585mig_df, aes(x=x, y=y, fill=as.factor(south_ANBO_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+ANHE_migclim <- ggplot() + 
+  geom_tile(data=ANHE_585mig_df, aes(x=x, y=y, fill=as.factor(south_ANHE_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+LISY_migclim <- ggplot() + 
+  geom_tile(data=LISY_585mig_df, aes(x=x, y=y, fill=as.factor(south_LISY_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+PSMA_migclim <- ggplot() + 
+  geom_tile(data=PSMA_585mig_df, aes(x=x, y=y, fill=as.factor(south_PSMA_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+RALU_migclim <- ggplot() + 
+  geom_tile(data=RALU_585mig_df, aes(x=x, y=y, fill=as.factor(south_RALU_base1_raster))) + 
+  scale_fill_manual(values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'))+ 
+  geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Ambystoma macrodactylum") +
+  ylim(-1100471, 4736542)+
+  scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
+  theme_classic(base_size = 15) +
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
+
+legend_b <- get_legend(
+  RALU_migclim + 
+    scale_fill_manual(name = "Distribution", 
+                      values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), 
+                      labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'),
+                      na.translate=FALSE) +
+    guides(color = guide_legend(nrow = 1)) +
+    theme(legend.position = "top")
+)
+
+plot_legend <- plot_grid(legend_b, labels = c(''))
+
+plot_maps <- plot_grid(ABMA_migclim, ANBO_migclim, ANHE_migclim, LISY_migclim, PSMA_migclim, RALU_migclim, labels = c('','', '', '', '', '',''), label_size = 2, ncol = 3, rel_heights = c(1,1,1,1,1,1,1))
+
+plot_final <- plot_grid(plot_legend, plot_maps, ncol = 1, rel_heights = c(.1,1))
+
+ggsave("./outputs/supp_figure3_585.png", plot = plot_final, 
+       width = 12, height = 9, dpi = 600)
+
+
