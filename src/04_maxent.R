@@ -68,8 +68,6 @@ PSMA_points <- PSMA_points %>% select('decimalLongitude', 'decimalLatitude')
 RALU_points <- RALU_points %>% select('decimalLongitude', 'decimalLatitude')
 
 
-#one last thing before running Maxent, going to check bioclim1 (mean annual temperature) and make a graph to show the differences through time across the three SSPs. this also helps with checking to make sure order/names didn't get messed up across North America.
-
 # next is to run maxent.
 #give java extra memory
 options(java.parameters = "-Xmx4g" )

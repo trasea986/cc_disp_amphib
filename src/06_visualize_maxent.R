@@ -356,7 +356,7 @@ ABMA_ini_enm_map <- ggplot() +
     ylim(-1100471, 4736542)+
     scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
     theme_classic(base_size = 15) +
-    theme(plot.title = element_text(face="italic"), legend.position = "right")  
+    theme(plot.title = element_text(face="italic"), legend.position = "none")  
 
 ANBO_ini_enm_map <- ggplot() + 
   geom_raster(data = ANBO_ini_enm_df, aes(x = x, y = y, fill = ANBO_ini_cont)) + 
@@ -370,7 +370,7 @@ ANBO_ini_enm_map <- ggplot() +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
-  theme(plot.title = element_text(face="italic"), legend.position = "right")
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
 
 ANHE_ini_enm_map <- ggplot() + 
   geom_raster(data = ANHE_ini_enm_df, aes(x = x, y = y, fill = ANHE_ini_cont)) + 
@@ -384,7 +384,7 @@ ANHE_ini_enm_map <- ggplot() +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
-  theme(plot.title = element_text(face="italic"), legend.position = "right")
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
 
 LISY_ini_enm_map <- ggplot() + 
   geom_raster(data = LISY_ini_enm_df, aes(x = x, y = y, fill = LISY_ini_cont)) + 
@@ -398,7 +398,7 @@ LISY_ini_enm_map <- ggplot() +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
-  theme(plot.title = element_text(face="italic"), legend.position = "right")
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
 
 PSMA_ini_enm_map <- ggplot() + 
   geom_raster(data = PSMA_ini_enm_df, aes(x = x, y = y, fill = PSMA_ini_cont)) + 
@@ -412,7 +412,7 @@ PSMA_ini_enm_map <- ggplot() +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
-  theme(plot.title = element_text(face="italic"), legend.position = "right")
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
 
 RALU_ini_enm_map <- ggplot() + 
   geom_raster(data = RALU_ini_enm_df, aes(x = x, y = y, fill = RALU_ini_cont)) + 
@@ -426,7 +426,7 @@ RALU_ini_enm_map <- ggplot() +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
-  theme(plot.title = element_text(face="italic"), legend.position = "right")
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
 
 
 plot_final <- plot_grid(ABMA_ini_enm_map, ANBO_ini_enm_map, ANHE_ini_enm_map, LISY_ini_enm_map, PSMA_ini_enm_map, RALU_ini_enm_map, labels = c('','', '', '', '', '',''), label_size = 0, ncol = 3, rel_heights = c(1,1,1,1,1,1,1))
@@ -452,7 +452,7 @@ ABMA_enm_map <- ggplot() +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
-  theme(plot.title = element_text(face="italic"), legend.position = "right")  
+  theme(plot.title = element_text(face="italic"), legend.position = "none")  
 
 ANBO_enm_map <- ggplot() + 
   geom_raster(data = ANBO_enm_df, aes(x = x, y = y, fill = ANBO_hs1)) + 
@@ -466,7 +466,7 @@ ANBO_enm_map <- ggplot() +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
-  theme(plot.title = element_text(face="italic"), legend.position = "right")
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
 
 ANHE_enm_map <- ggplot() + 
   geom_raster(data = ANHE_enm_df, aes(x = x, y = y, fill = ANHE_hs1)) + 
@@ -480,7 +480,7 @@ ANHE_enm_map <- ggplot() +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
-  theme(plot.title = element_text(face="italic"), legend.position = "right")
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
 
 LISY_enm_map <- ggplot() + 
   geom_raster(data = LISY_enm_df, aes(x = x, y = y, fill = LISY_hs1)) + 
@@ -494,7 +494,7 @@ LISY_enm_map <- ggplot() +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
-  theme(plot.title = element_text(face="italic"), legend.position = "right")
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
 
 PSMA_enm_map <- ggplot() + 
   geom_raster(data = PSMA_enm_df, aes(x = x, y = y, fill = PSMA_hs1)) + 
@@ -508,7 +508,7 @@ PSMA_enm_map <- ggplot() +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
-  theme(plot.title = element_text(face="italic"), legend.position = "right")
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
 
 RALU_enm_map <- ggplot() + 
   geom_raster(data = RALU_enm_df, aes(x = x, y = y, fill = RALU_hs1)) + 
@@ -522,7 +522,7 @@ RALU_enm_map <- ggplot() +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
-  theme(plot.title = element_text(face="italic"), legend.position = "right")
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
 
 
 plot_final <- plot_grid(ABMA_enm_map, ANBO_enm_map, ANHE_enm_map, LISY_enm_map, PSMA_enm_map, RALU_enm_map, labels = c('','', '', '', '', '',''), label_size = 0, ncol = 3, rel_heights = c(1,1,1,1,1,1,1))

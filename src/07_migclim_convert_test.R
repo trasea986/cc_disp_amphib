@@ -20,15 +20,14 @@ library(raster)
 library(future.apply)
 multicore(workers = 6)
 #plan(multicore) if lapply only using sp_list
-#for Windows machines use (multiprocess)
-plan(list(sequential, multicore)) #work through ssps/climate change sequentially, but
+#for Windows machines use (multisession)
+#plan(multicore)
+plan(multisession)
 
 #need to the quantile thresholds. this does not need to be run if this script is run in the same sessions as the maxent output prep script
 
 sp_ls <- c("ABMA", "ANBO", "ANHE", "LISY", "PSMA", "RALU")
 
-#and ssp list for lapply later
-cc_list <- c('ssp245', 'ssp370', 'ssp585')
 
 #set up points and extract
 points_all_sp <- read.csv('./outputs/data_proc/cleaned_points.csv')
@@ -84,22 +83,25 @@ print('quants calculated and saved')
 
 #SKIP if already run once
 
-# for (i in sp_ls){
-#   ini <- raster(paste('./outputs/maxent/rasters/ssp245/',i,'_ini.tif', sep = ''))
-#   ex <- raster(paste('./outputs/maxent/rasters/ssp245/',i,'_hs1.tif', sep = ''))
-#  ini_extended <- extend(ini, ex)
-#  writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_ini_final.tif', sep=''), filetype = 'GTiff')
-#  writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp370/',i,'_ini_final.tif', sep=''), filetype = 'GTiff')
-#  writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp585/',i,'_ini_final.tif', sep=''), filetype = 'GTiff')
-#   
-#   ini_south <- raster(paste('./outputs/maxent/rasters/ssp245/',i,'_ini_south.tif', sep =''))
-#   ini_extended <- extend(ini_south, ex)
-#   writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_ini_south_final.tif', sep=''), filetype = 'GTiff')
-#   writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp370/',i,'_ini_south_final.tif', sep=''), filetype = 'GTiff') 
-#   writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp585/',i,'_ini_south_final.tif', sep=''), filetype = 'GTiff') 
-# }
+for (i in sp_ls){
+  ini <- raster(paste('./outputs/maxent/rasters/ssp245/',i,'_ini.tif', sep = ''))
+  ex <- raster(paste('./outputs/maxent/rasters/ssp245/',i,'_hs1.tif', sep = ''))
+  ini_extended <- extend(ini, ex, value = 0)
+  ini_extended <- mask(ini_extended, ex)
+ writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_ini_final.tif', sep=''), filetype = 'GTiff', overwrite=TRUE)
+ writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp370/',i,'_ini_final.tif', sep=''), filetype = 'GTiff', overwrite=TRUE)
+ writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp585/',i,'_ini_final.tif', sep=''), filetype = 'GTiff', overwrite=TRUE)
 
+  ini_south <- raster(paste('./outputs/maxent/rasters/ssp245/',i,'_ini_south.tif', sep =''))
+  ini_south[is.na(ini_south[])] <- 0 
+  ini_extended <- extend(ini_south, ex, value = 0)
+  ini_extended <- mask(ini_extended, ex)
+  writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp245/',i,'_ini_south_final.tif', sep=''), filetype = 'GTiff', overwrite=TRUE)
+  writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp370/',i,'_ini_south_final.tif', sep=''), filetype = 'GTiff', overwrite=TRUE)
+  writeRaster(ini_extended, filename=paste('./outputs/maxent/rasters/ssp585/',i,'_ini_south_final.tif', sep=''), filetype = 'GTiff', overwrite=TRUE)
+}
 
+print("Ini final files created")
 
 #run a test for each species that is short, to create the asc files MigClim will actually use
 
@@ -112,11 +114,7 @@ setwd("./outputs/maxent/rasters/ssp245")
 
 print('begin MigClim tests and conversions')
 
-future_lapply(cc_list, function(c) {
-  
-  setwd(paste('../', c, sep=''))
-  
-  future_lapply(sp_ls, function(i) {
+future_lapply(sp_ls, function(i) {
   
   start <- (paste(i, 'start', Sys.time()))
   
@@ -167,9 +165,8 @@ future_lapply(cc_list, function(c) {
   write.table(time, "time.csv", sep = ",", col.names = FALSE, append = TRUE)
 
   }, future.seed = TRUE)
-}, future.seed = TRUE)
 
-print('Conversion complete')
+print('Conversion test runs complete')
 
 #Next, run all of the scenarios from the original list/script using 07a on the cluster
 

@@ -67,8 +67,6 @@ LISY_ENM_values <- as.data.frame(LISY_ENM_values)
 PSMA_ENM_values <- as.data.frame(PSMA_ENM_values)
 RALU_ENM_values <- as.data.frame(RALU_ENM_values)
 
-#calculate mean at occupancy value and subtract one standard deviation to determine the thresholds for the initial distribution
-
 ABMA_quant <- quantile(ABMA_ENM_values, probs = 0.10, na.rm = TRUE)
 ANBO_quant <- quantile(ANBO_ENM_values, probs = 0.10, na.rm = TRUE)
 ANHE_quant <- quantile(ANHE_ENM_values, probs = 0.10, na.rm = TRUE)

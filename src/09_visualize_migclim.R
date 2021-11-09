@@ -791,7 +791,7 @@ LISY_migclim <- raster('outputs/migclim/ssp585/full_LISY_base/full_LISY_base1_ra
 PSMA_migclim <- raster('outputs/migclim/ssp585/full_PSMA_base/full_PSMA_base1_raster.asc')
 RALU_migclim <- raster('outputs/migclim/ssp585/full_RALU_base/full_RALU_base1_raster.asc')
 
-migclim_stack_245 <- stack(ABMA_migclim, ANBO_migclim, ANHE_migclim, LISY_migclim, PSMA_migclim, RALU_migclim)
+migclim_stack_585 <- stack(ABMA_migclim, ANBO_migclim, ANHE_migclim, LISY_migclim, PSMA_migclim, RALU_migclim)
 
 migclim_processed_585 <- list()
 for (i in 1:6) {
@@ -836,7 +836,8 @@ ABMA_migclim <- ggplot() +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
-  theme(plot.title = element_text(face="italic"), legend.position = "none")
+  guides(fill = guide_legend(override.aes = list(color = "black")))+
+  theme(plot.title = element_text(face="italic"))#, legend.position = "none")
 
 ANBO_migclim <- ggplot() + 
   geom_tile(data=ANBO_245mig_df, aes(x=x, y=y, fill=as.factor(full_ANBO_base1_raster))) + 
@@ -844,10 +845,11 @@ ANBO_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Anaxyrus boreas") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
+  guides(fill = guide_legend(override.aes = list(color = "black")))+
   theme(plot.title = element_text(face="italic"), legend.position = "none")
 
 ANHE_migclim <- ggplot() + 
@@ -856,10 +858,11 @@ ANHE_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Anaxyrus hemiophrys") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
+  guides(fill = guide_legend(override.aes = list(color = "black")))+
   theme(plot.title = element_text(face="italic"), legend.position = "none")
 
 LISY_migclim <- ggplot() + 
@@ -868,10 +871,11 @@ LISY_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Lithobates sylvaticus") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
+  guides(fill = guide_legend(override.aes = list(color = "black")))+
   theme(plot.title = element_text(face="italic"), legend.position = "none")
 
 PSMA_migclim <- ggplot() + 
@@ -880,10 +884,11 @@ PSMA_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Pseudacris maculata") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
+  guides(fill = guide_legend(override.aes = list(color = "black")))+
   theme(plot.title = element_text(face="italic"), legend.position = "none")
 
 RALU_migclim <- ggplot() + 
@@ -892,19 +897,20 @@ RALU_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Rana luteiventris") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
+  guides(fill = guide_legend(override.aes = list(color = "black")))+
   theme(plot.title = element_text(face="italic"), legend.position = "none")
 
 legend_b <- get_legend(
   RALU_migclim + 
-    scale_fill_manual(name = "Distribution", 
+    scale_fill_manual(name = "", 
                       values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), 
                       labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'),
                       na.translate=FALSE) +
-    guides(color = guide_legend(nrow = 1)) +
+    guides(color = guide_legend(nrow = 1),fill = guide_legend(override.aes = list(color = "black"))) +
     theme(legend.position = "top")
 )
 
@@ -939,7 +945,7 @@ ANBO_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Anaxyrus boreas") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
@@ -951,7 +957,7 @@ ANHE_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Anaxyrus hemiophrys") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
@@ -963,7 +969,7 @@ LISY_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Lithobates sylvaticus") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
@@ -975,7 +981,7 @@ PSMA_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Pseudacris maculata") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
@@ -987,7 +993,7 @@ RALU_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Rana luteiventris") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
@@ -999,7 +1005,7 @@ legend_b <- get_legend(
                       values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), 
                       labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'),
                       na.translate=FALSE) +
-    guides(color = guide_legend(nrow = 1)) +
+    guides(color = guide_legend(nrow = 1),fill = guide_legend(override.aes = list(color = "black"))) +
     theme(legend.position = "top")
 )
 
@@ -1033,7 +1039,7 @@ ANBO_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Anaxyrus boreas") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
@@ -1045,7 +1051,7 @@ ANHE_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Anaxyrus hemiophrys") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
@@ -1057,7 +1063,7 @@ LISY_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Lithobates sylvaticus") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
@@ -1069,7 +1075,7 @@ PSMA_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Pseudacris maculata") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
@@ -1081,7 +1087,7 @@ RALU_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Rana luteiventris") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
@@ -1093,7 +1099,7 @@ legend_b <- get_legend(
                       values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), 
                       labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'),
                       na.translate=FALSE) +
-    guides(color = guide_legend(nrow = 1)) +
+    guides(color = guide_legend(nrow = 1),fill = guide_legend(override.aes = list(color = "black"))) +
     theme(legend.position = "top")
 )
 
@@ -1103,7 +1109,7 @@ plot_maps <- plot_grid(ABMA_migclim, ANBO_migclim, ANHE_migclim, LISY_migclim, P
 
 plot_final <- plot_grid(plot_legend, plot_maps, ncol = 1, rel_heights = c(.1,1))
 
-ggsave("./outputs/supp_figure2_585.png", plot = plot_final, 
+ggsave("./outputs/figure2_585.png", plot = plot_final, 
        width = 12, height = 9, dpi = 600)
 
 
@@ -1175,7 +1181,7 @@ LISY_migclim <- raster('outputs/migclim/ssp585/south_LISY_base/south_LISY_base1_
 PSMA_migclim <- raster('outputs/migclim/ssp585/south_PSMA_base/south_PSMA_base1_raster.asc')
 RALU_migclim <- raster('outputs/migclim/ssp585/south_RALU_base/south_RALU_base1_raster.asc')
 
-migclim_stack_245 <- stack(ABMA_migclim, ANBO_migclim, ANHE_migclim, LISY_migclim, PSMA_migclim, RALU_migclim)
+migclim_stack_585 <- stack(ABMA_migclim, ANBO_migclim, ANHE_migclim, LISY_migclim, PSMA_migclim, RALU_migclim)
 
 migclim_processed_585 <- list()
 for (i in 1:6) {
@@ -1227,7 +1233,7 @@ ANBO_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Anaxyrus boreas") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
@@ -1239,7 +1245,7 @@ ANHE_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Anaxyrus hemiophrys") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
@@ -1251,7 +1257,7 @@ LISY_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Lithobates sylvaticus") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
@@ -1263,7 +1269,7 @@ PSMA_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Pseudacris maculata") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
@@ -1275,7 +1281,7 @@ RALU_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Rana luteiventris") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
@@ -1287,7 +1293,7 @@ legend_b <- get_legend(
                       values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), 
                       labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'),
                       na.translate=FALSE) +
-    guides(color = guide_legend(nrow = 1)) +
+    guides(color = guide_legend(nrow = 1),fill = guide_legend(override.aes = list(color = "black"))) +
     theme(legend.position = "top")
 )
 
@@ -1322,7 +1328,7 @@ ANBO_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Anaxyrus boreas") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
@@ -1334,7 +1340,7 @@ ANHE_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Anaxyrus hemiophrys") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
@@ -1346,7 +1352,7 @@ LISY_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Lithobates sylvaticus") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
@@ -1358,7 +1364,7 @@ PSMA_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Pseudacris maculata") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
@@ -1370,7 +1376,7 @@ RALU_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Rana luteiventris") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
@@ -1382,7 +1388,7 @@ legend_b <- get_legend(
                       values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), 
                       labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'),
                       na.translate=FALSE) +
-    guides(color = guide_legend(nrow = 1)) +
+    guides(color = guide_legend(nrow = 1),fill = guide_legend(override.aes = list(color = "black"))) +
     theme(legend.position = "top")
 )
 
@@ -1416,7 +1422,7 @@ ANBO_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Anaxyrus boreas") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
@@ -1428,7 +1434,7 @@ ANHE_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Anaxyrus hemiophrys") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
@@ -1440,7 +1446,7 @@ LISY_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Lithobates sylvaticus") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
@@ -1452,7 +1458,7 @@ PSMA_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Pseudacris maculata") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
@@ -1464,7 +1470,7 @@ RALU_migclim <- ggplot() +
   geom_sf(data=world_repro, color = "black", fill = "white", alpha=0) +
   xlab("Longitude") +
   ylab("Latitude") +
-  ggtitle("Ambystoma macrodactylum") +
+  ggtitle("Rana luteiventris") +
   ylim(-1100471, 4736542)+
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
@@ -1476,7 +1482,7 @@ legend_b <- get_legend(
                       values = c("yellow3", "white", "darkgrey", "darkblue", "green2"), 
                       labels = c('Lost Initial', 'Never Suitable', 'Maintained Initial', 'Suitable, Colonized', 'Suitable, Vacant'),
                       na.translate=FALSE) +
-    guides(color = guide_legend(nrow = 1)) +
+    guides(color = guide_legend(nrow = 1),fill = guide_legend(override.aes = list(color = "black"))) +
     theme(legend.position = "top")
 )
 
@@ -1486,7 +1492,5 @@ plot_maps <- plot_grid(ABMA_migclim, ANBO_migclim, ANHE_migclim, LISY_migclim, P
 
 plot_final <- plot_grid(plot_legend, plot_maps, ncol = 1, rel_heights = c(.1,1))
 
-ggsave("./outputs/supp_figure3_585.png", plot = plot_final, 
+ggsave("./outputs/figure3_585.png", plot = plot_final, 
        width = 12, height = 9, dpi = 600)
-
-
