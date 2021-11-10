@@ -21,8 +21,11 @@ library(future.apply)
 multicore(workers = 6)
 #plan(multicore) if lapply only using sp_list
 #for Windows machines use (multisession)
-#plan(multicore)
-plan(multisession)
+plan(multicore, workers = 6)
+#plan(multisession, workers = 12, envir = parent.frame())
+multisession(workers = 12, envir = parent.frame())
+
+plan(multisession, workers = 12)
 
 #need to the quantile thresholds. this does not need to be run if this script is run in the same sessions as the maxent output prep script
 
@@ -114,7 +117,9 @@ setwd("./outputs/maxent/rasters/ssp245")
 
 print('begin MigClim tests and conversions')
 
-future_lapply(sp_ls, function(i) {
+sp_ls1 <- list('ABMA', 'ANBO', 'ANHE', 'LISY', 'PSMA', 'RALU')
+
+future_lapply(sp_ls1, function(i) {
   
   start <- (paste(i, 'start', Sys.time()))
   
@@ -169,4 +174,108 @@ future_lapply(sp_ls, function(i) {
 print('Conversion test runs complete')
 
 #Next, run all of the scenarios from the original list/script using 07a on the cluster
+setwd("../ssp370")
+future_lapply(sp_ls1, function(i) {
+  
+  start <- (paste(i, 'start', Sys.time()))
+  
+  MigClim.migrate(iniDist = paste(i,"_ini_final", sep = ''),
+                  hsMap=paste(i,'_hs', sep = ''),
+                  rcThreshold = round(as.numeric(get(paste(i,'_quant', sep = '')))),
+                  envChgSteps=5,
+                  dispSteps=1,
+                  dispKernel=c(.1),
+                  iniMatAge=1,
+                  propaguleProd=c(1),
+                  lddFreq=0.05,
+                  lddMinDist=3,
+                  lddMaxDist=4,
+                  simulName=paste(i,'_test', sep = ''),
+                  replicateNb=1,
+                  overWrite=TRUE,
+                  testMode=FALSE,
+                  fullOutput=FALSE,
+                  keepTempFiles=TRUE)
+  
+  unlink(paste('./',i,'_test/',i,'_test_raster.asc', sep =''))
+  
+  MigClim.migrate(iniDist = paste(i,"_ini_south_final", sep = ''),
+                  hsMap=paste(i,'_hs', sep = ''),
+                  rcThreshold = round(as.numeric(get(paste(i,'_quant', sep = '')))),
+                  envChgSteps=5,
+                  dispSteps=1,
+                  dispKernel=c(.1),
+                  iniMatAge=1, 
+                  propaguleProd=c(1),
+                  lddFreq=0.05, 
+                  lddMinDist=3, 
+                  lddMaxDist=4,
+                  simulName=paste(i,'_south_test', sep = ''), 
+                  replicateNb=1,
+                  overWrite=TRUE,
+                  testMode=FALSE, 
+                  fullOutput=FALSE, 
+                  keepTempFiles=TRUE)
+  
+  unlink(paste('./',i,'_south_test/',i,'_south_test_raster.asc', sep =''))
+  
+  end <- paste(i, 'end', Sys.time())
+  
+  time <- rbind(start, end)
+  
+  write.table(time, "time.csv", sep = ",", col.names = FALSE, append = TRUE)
+  
+}, future.seed = TRUE)
 
+setwd("../ssp585")
+future_lapply(sp_ls1, function(i) {
+  
+  start <- (paste(i, 'start', Sys.time()))
+  
+  MigClim.migrate(iniDist = paste(i,"_ini_final", sep = ''),
+                  hsMap=paste(i,'_hs', sep = ''),
+                  rcThreshold = round(as.numeric(get(paste(i,'_quant', sep = '')))),
+                  envChgSteps=5,
+                  dispSteps=1,
+                  dispKernel=c(.1),
+                  iniMatAge=1,
+                  propaguleProd=c(1),
+                  lddFreq=0.05,
+                  lddMinDist=3,
+                  lddMaxDist=4,
+                  simulName=paste(i,'_test', sep = ''),
+                  replicateNb=1,
+                  overWrite=TRUE,
+                  testMode=FALSE,
+                  fullOutput=FALSE,
+                  keepTempFiles=TRUE)
+  
+  unlink(paste('./',i,'_test/',i,'_test_raster.asc', sep =''))
+  
+  MigClim.migrate(iniDist = paste(i,"_ini_south_final", sep = ''),
+                  hsMap=paste(i,'_hs', sep = ''),
+                  rcThreshold = round(as.numeric(get(paste(i,'_quant', sep = '')))),
+                  envChgSteps=5,
+                  dispSteps=1,
+                  dispKernel=c(.1),
+                  iniMatAge=1, 
+                  propaguleProd=c(1),
+                  lddFreq=0.05, 
+                  lddMinDist=3, 
+                  lddMaxDist=4,
+                  simulName=paste(i,'_south_test', sep = ''), 
+                  replicateNb=1,
+                  overWrite=TRUE,
+                  testMode=FALSE, 
+                  fullOutput=FALSE, 
+                  keepTempFiles=TRUE)
+  
+  unlink(paste('./',i,'_south_test/',i,'_south_test_raster.asc', sep =''))
+  
+  end <- paste(i, 'end', Sys.time())
+  
+  time <- rbind(start, end)
+  
+  write.table(time, "time.csv", sep = ",", col.names = FALSE, append = TRUE)
+  
+}, future.seed = TRUE)

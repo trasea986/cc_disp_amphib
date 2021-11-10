@@ -87,3 +87,122 @@ all_sp <- prop %>%
   summarise(across(ini_km:max_disp_prop, ~ mean(.x, na.rm = TRUE)))
 
 write.csv(all_sp, "table3_all_sp_avg.csv")
+
+#one visualization bit, the occupied means and stdev across the three climate change scenarios
+
+ggplot(data=df_migclim, aes(x=species, y=as.numeric(occupiedCount))) +
+  geom_boxplot(aes(color = SSP)) +
+  scale_colour_manual(values = c("blue3", "green4", "grey35")) +
+  facet_wrap(~range, scales = "free") +
+  xlab("Species")+
+  ylab("Occupied Raster Cells") +
+  theme_classic()
+
+#next up is the actual sensitivity analysis
+#need to create the rows that will represent the base model
+sens1 <- df_migclim %>%
+  filter(category == "base")
+
+#next, replicate the sens1 df multiple times, will a set of five rows (the replicates) for each of the categories.
+#then, replace category and value with the base information
+#as a reminder, this is the migclim base model:
+
+#dispersal kernal, rate = 0.1
+#dispersa kernal, distance = 5 (100 m increments, e.g. "30" value is 6 cells, "10" is 2 cells)
+#iniMatAge=1, 
+#lddFreq=0.05, commented out/0 in base model
+#lddMaxDist=4, commented out/0 in base model
+
+#will need to do this for each category: age     base distance  ldddist  lddrate     rate 
+age <- sens1
+age$category <- c('age')
+age$value <- c('1')
+
+distance <- sens1
+distance$category <- c('distance')
+distance$value <- c('5')
+
+ldddist <- sens1
+ldddist$category <- c('ldddist')
+ldddist$value <- c('0')
+
+lddrate <- sens1
+lddrate$category <- c('lddrate')
+lddrate$value <- c('0')
+
+rate <- sens1
+rate$category <- c('rate')
+rate$value <- c('0.1')
+
+#create df without the base bits, then row bind all together
+sens2 <- df_migclim %>%
+  filter(category != "base")
+sensitivity_df <- rbind(sens2, age, distance, ldddist, lddrate, rate)
+
+#define structure of chr columns
+sensitivity_df$SSP <- as.factor(sensitivity_df$SSP)
+sensitivity_df$category <- as.factor(sensitivity_df$category)
+sensitivity_df$range <- as.factor(sensitivity_df$range)
+sensitivity_df$value <- as.numeric(sensitivity_df$value)
+
+#next, calculate the mean across replicates
+sensitivity_df <- sensitivity_df %>%
+  group_by(species, SSP, category, range, value) %>%
+  summarise(mean_occ = mean(occupiedCount, na.rm = T))
+
+#determine minimum value for the category
+#note that all of parameters decrease the occuped cells except age, so age needs to be calculated sep and brought back
+sensitivity_df1 <- sensitivity_df %>%
+  filter(category != 'age') %>%
+  group_by(species, SSP, category, range) %>%
+  mutate(min_value = min(value)) %>% #determine the minimum value
+  mutate(min_occ = min(mean_occ))
+
+sensitivity_df2 <- sensitivity_df %>%
+  filter(category == 'age') %>%
+  group_by(species, SSP, category, range) %>%
+  mutate(min_value = max(value)) %>% #determine the minimum value
+  mutate(min_occ = min(mean_occ))
+
+#change in occupiedCount
+sensitivity_df1$occ_change <- sensitivity_df1$mean_occ - sensitivity_df1$min_occ
+sensitivity_df2$occ_change <- sensitivity_df2$mean_occ - sensitivity_df2$min_occ
+
+#change in parameter
+sensitivity_df1$param_change <- as.numeric(sensitivity_df1$value) - as.numeric(sensitivity_df1$min_value)
+sensitivity_df2$param_change <- as.numeric(sensitivity_df2$value) - as.numeric(sensitivity_df2$min_value)
+
+#proportional change of occupied compared to parameter, absolute value
+sensitivity_df1$sens <- abs(sensitivity_df1$occ_change / sensitivity_df1$param_change)
+sensitivity_df2$sens <- abs(sensitivity_df2$occ_change / sensitivity_df2$param_change)
+
+# multiply to get rid of the units and calculate proportional change. original param value / original occ value.
+sensitivity_df1$elast <- abs(sensitivity_df1$sens * (sensitivity_df1$value / sensitivity_df1$min_occ))
+sensitivity_df2$elast <- abs(sensitivity_df2$sens * (sensitivity_df2$value / sensitivity_df2$min_occ))
+
+#need to remove NAN after combining age and other calculations, keeping intermediate files as this is proving to be a bit challenging trying to piece together. this is the elasticity value of the min parameter
+sensitivity_df <- rbind(sensitivity_df1, sensitivity_df2)
+sensitivity_df <- sensitivity_df[is.finite(sensitivity_df$elast),]
+
+sensitivity_summary <- sensitivity_df %>%
+  group_by(species, SSP, category, range) %>%
+  summarize(avg_elast = mean(elast), std_elast = sd(elast))
+
+sensitivity_ranked <- sensitivity_summary %>% 
+  arrange(desc(avg_elast)) %>% 
+  group_by(species, SSP, range)%>% 
+  mutate(rank=row_number()) %>%
+  arrange(range, SSP, species)
+
+#order by ranking for full table
+sensitivity_ordered <- sensitivity_ranked[order(sensitivity_ranked$SSP, sensitivity_ranked$species, sensitivity_ranked$rank),]
+
+write.csv(sensitivity_ordered, '../supp_table3_full_sens.csv')
+
+#determine top 3
+sensitivity_table <- sensitivity_ordered %>%
+  select(-c(avg_elast, std_elast)) %>%
+  spread(category, rank) %>%
+  arrange(range, SSP)
+  
+write.csv(sensitivity_table, '../table4_sens_rank.csv')
