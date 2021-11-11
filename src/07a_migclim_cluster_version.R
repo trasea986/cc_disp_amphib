@@ -84,7 +84,7 @@ setwd("./outputs/maxent/rasters/ssp245")
 
 #Next, run all of the scenarios from the original list/script
 
-print("Starting MigClim")
+print("Starting MigClim 245")
 
 #Note LDD distance must not overlap with dispersal kernal, so for purposes of sensitivity setting rate and LDD to zero for base model, as opposed to increasing LDD distance in tandem with the dispersal kernal max distance being tested
 
