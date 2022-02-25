@@ -78,7 +78,7 @@ prop <- df_migclim %>%
   arrange(range, desc(SSP))
 
 #these full table
-write.csv(prop, "table3_raw.csv")
+#write.csv(prop, "table3_raw.csv")
 
 #next is to calculate the average by SSP for all species, which is added to the table in excel when doing final formatting
 
@@ -86,17 +86,20 @@ all_sp <- prop %>%
   group_by(SSP, range) %>%
   summarise(across(ini_km:max_disp_prop, ~ mean(.x, na.rm = TRUE)))
 
-write.csv(all_sp, "table3_all_sp_avg.csv")
+#write.csv(all_sp, "table3_all_sp_avg.csv")
 
 #one visualization bit, the occupied means and stdev across the three climate change scenarios
 
-ggplot(data=df_migclim, aes(x=species, y=as.numeric(occupiedCount))) +
+spp_ranges <- ggplot(data=df_migclim, aes(x=species, y=as.numeric(occupiedCount))) +
   geom_boxplot(aes(color = SSP)) +
   scale_colour_manual(values = c("blue3", "green4", "grey35")) +
   facet_wrap(~range, scales = "free") +
   xlab("Species")+
   ylab("Occupied Raster Cells") +
   theme_classic()
+
+ggsave("./SSP_range_size.png", plot = spp_ranges, 
+       width = 12, height = 9, dpi = 600)
 
 #next up is the actual sensitivity analysis
 #need to create the rows that will represent the base model
@@ -197,7 +200,7 @@ sensitivity_ranked <- sensitivity_summary %>%
 #order by ranking for full table
 sensitivity_ordered <- sensitivity_ranked[order(sensitivity_ranked$SSP, sensitivity_ranked$species, sensitivity_ranked$rank),]
 
-write.csv(sensitivity_ordered, '../supp_table3_full_sens.csv')
+#write.csv(sensitivity_ordered, '../supp_table3_full_sens.csv')
 
 #determine top 3
 sensitivity_table <- sensitivity_ordered %>%
@@ -205,4 +208,4 @@ sensitivity_table <- sensitivity_ordered %>%
   spread(category, rank) %>%
   arrange(range, SSP)
   
-write.csv(sensitivity_table, '../table4_sens_rank.csv')
+#write.csv(sensitivity_table, '../table4_sens_rank.csv')

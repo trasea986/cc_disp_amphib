@@ -837,7 +837,7 @@ ABMA_migclim <- ggplot() +
   scale_x_continuous(limits = c(-3530000, 2670000), breaks = seq(-140, -60, by = 20)) +
   theme_classic(base_size = 15) +
   guides(fill = guide_legend(override.aes = list(color = "black")))+
-  theme(plot.title = element_text(face="italic"))#, legend.position = "none")
+  theme(plot.title = element_text(face="italic"), legend.position = "none")
 
 ANBO_migclim <- ggplot() + 
   geom_tile(data=ANBO_245mig_df, aes(x=x, y=y, fill=as.factor(full_ANBO_base1_raster))) + 
