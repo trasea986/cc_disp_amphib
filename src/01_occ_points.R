@@ -28,8 +28,8 @@ keys <- as.data.frame(unlist(lapply(gbif_taxon_keys, "[", , "specieskey")))
 
 colnames(keys) = c("key")
 
-#remove duplicated ABMA key
-keys <- unique(keys$key)
+#remove duplicated ABMA key if needed due to running tests
+#keys <- unique(keys$key)
 
 #prepare download list from gbif. note that user, pwd, and email credentials and need to be created
 occ_prep <- occ_download(

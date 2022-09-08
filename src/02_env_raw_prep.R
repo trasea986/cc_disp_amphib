@@ -54,10 +54,10 @@ terra::project(bio_layers[[17]], projection, method="bilinear", mask=TRUE, filen
 terra::project(bio_layers[[18]], projection, method="bilinear", mask=TRUE, filename = "./outputs/data_proc/present_repro/present_reprojected_bio18.tif", overwrite=TRUE)
 terra::project(bio_layers[[19]], projection, method="bilinear", mask=TRUE, filename = "./outputs/data_proc/present_repro/present_reprojected_bio19.tif", overwrite=TRUE)
 
-bio_files_repro <- list.files(path = './outputs/data_proc/present_repro', pattern = '*.tif', all.files = TRUE, full.names = TRUE)
-
-#load in the rasters
-bio_layers_repro <- rast(bio_files_repro)
+# bio_files_repro <- list.files(path = './outputs/data_proc/present_repro', pattern = '*.tif', all.files = TRUE, full.names = TRUE)
+# 
+# #load in the rasters
+# bio_layers_repro <- rast(bio_files_repro)
 
 
 #next we will focus on removing correlated variables
@@ -67,8 +67,15 @@ extracted_vals <- extract(bio_layers_repro, points_all_sp[2:3])
 #convert to df
 extracted_df <- as.data.frame(extracted_vals)
 
+#remove ID column
+extracted_df <- extracted_df[,-1]
+
 #calculate the correlation among our variables at our points
 mydata.cor <- cor(extracted_df, method = 'spearman', use = 'complete.obs')
+
+#make plot
+corrplot(mydata.cor, method = 'circle', type = 'lower', insig='blank',
+         addCoef.col ='black', number.cex = 0.8, diag=FALSE)
 
 #set up the correlation value cutoff you want to use to make the list of highly correlated variables
 hc <- findCorrelation(mydata.cor, cutoff = 0.8)
