@@ -90,13 +90,31 @@ all_sp <- prop %>%
 
 #one visualization bit, the occupied means and stdev across the three climate change scenarios
 
-spp_ranges <- ggplot(data=df_migclim, aes(x=species, y=as.numeric(occupiedCount))) +
+df_migclim_plot <- df_migclim
+
+df_migclim_plot$SSP <- as.factor(df_migclim_plot$SSP)
+df_migclim_plot$SSP <- recode_factor(df_migclim_plot$SSP, ssp245 = "SSP245",
+                                ssp370 = 'SSP370',
+                                ssp585 = "SSP585")
+
+df_migclim_plot$range <- as.factor(df_migclim_plot$range)
+df_migclim_plot$range <- recode_factor(df_migclim_plot$range, full = "Full Range", 
+                                     south = "Only Southern Range")
+
+df_migclim_plot$species <- as.factor(df_migclim_plot$species)
+df_migclim_plot$species <- recode_factor(df_migclim_plot$species, ABMA = 'Ambystoma macrodactylum', ANBO = 'Anaxyrus boreas', ANHE = 'Anaxyrus hemiophrys', PSMA = 'Pseudacris maculata', LISY = 'Lithobates sylvaticus', RALU = 'Rana luteiventris')
+
+
+spp_ranges <- 
+  ggplot(data=df_migclim_plot, aes(x=species, y=as.numeric(occupiedCount * 576.9299/1000))) +
   geom_boxplot(aes(color = SSP)) +
   scale_colour_manual(values = c("blue3", "green4", "grey35")) +
-  facet_wrap(~range, scales = "free") +
+  facet_wrap(~range)+ #, scales = "free") + if wanting different scales
   xlab("Species")+
-  ylab("Occupied Raster Cells") +
-  theme_classic()
+  ylab("Occupied Kilometers") +
+  scale_y_continuous(labels = scales::comma)+
+  theme_classic(base_size = 14)+
+  theme(axis.text.x = element_text(angle = 90, face = 'italic', hjust=0.95,vjust=0.2))
 
 ggsave("./SSP_range_size.png", plot = spp_ranges, 
        width = 12, height = 9, dpi = 600)
@@ -185,7 +203,7 @@ sensitivity_df2$elast <- abs(sensitivity_df2$sens * (sensitivity_df2$value / sen
 
 #need to remove NAN after combining age and other calculations, keeping intermediate files as this is proving to be a bit challenging trying to piece together. this is the elasticity value of the min parameter
 sensitivity_df <- rbind(sensitivity_df1, sensitivity_df2)
-sensitivity_df <- sensitivity_df[is.finite(sensitivity_df$elast),]
+sensitivity_df <- sensitivity_df[is.finite(sensitivity_df$sens),] #removes "base" model (NaN)
 
 sensitivity_summary <- sensitivity_df %>%
   group_by(species, SSP, category, range) %>%
@@ -200,7 +218,7 @@ sensitivity_ranked <- sensitivity_summary %>%
 #order by ranking for full table
 sensitivity_ordered <- sensitivity_ranked[order(sensitivity_ranked$SSP, sensitivity_ranked$species, sensitivity_ranked$rank),]
 
-#write.csv(sensitivity_ordered, '../supp_table3_full_sens.csv')
+#write.csv(sensitivity_ordered, '../sens_ranked_ordered_supp_table4.csv')
 
 #determine top 3
 sensitivity_table <- sensitivity_ordered %>%
@@ -208,4 +226,11 @@ sensitivity_table <- sensitivity_ordered %>%
   spread(category, rank) %>%
   arrange(range, SSP)
   
-#write.csv(sensitivity_table, '../table4_sens_rank.csv')
+#write.csv(sensitivity_table, '../table4_sens_rank_fixed_lisy.csv')
+
+#helpful code for troubleshooting the missing LISY 585 south, probably due to zeroes. below returns just these data
+sensitivity_df %>%
+  filter(species == 'LISY' & SSP == 'ssp585' & range == 'south')
+
+sensitivity_df %>%
+  filter(species == 'PSMA' & SSP == 'ssp585' & range == 'south')
